@@ -34,25 +34,38 @@ tw-passage {
 	display: flex;
   	justify-content: center;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name=" Continue Straight" tags="" position="1025,1275" size="100,100">{
+(set: $health = $health - $bleedRate)
 (set: $progress = $progress + 2)
 (if: $seeMetrics)[
-	HP: $health
-    Bleed Rate: $bleedRate
-    Attack Strength: $attack
-    Mobility: $mobility
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
 ]
-(if: $progress &gt; 99)[
-	You see the exit up ahead. You can finally make your escape!
-    [[Exit the Building]]
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else-if: $progress &gt; 99)[
+	You see the exit up ahead. You can finally make your escape! &lt;br/&gt;
+    [[Exit the Building]] &lt;br/&gt;
     [[Enter a Nearby Room]] 
+] (else-if: (random:0,100) &lt; 15)[
+	You begin to feel faint and nauseous... &lt;br/&gt;
+    There is an examination room nearby &lt;br/&gt;
+    [[Enter Examination Room]]
+    [[Lie Down and Rest For a Bit (I don&#39;t think you will survive this)-&gt;Game Over]] 
 ] (else:)[
 	(if: (random:0,100) &lt; 33)[
-    	You approach an intersection of hallways
-        [[Turn Left]]
-        [[Turn Right]]
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
  	]
-    [[ Continue Straight]] 
+    [[ Continue Straight]]  &lt;br/&gt;
     [[Enter a Nearby Room]]
+    (if: (random:0,100) &lt; $karma / 2)[
+    	There is also a stairwell to go down a few floors &lt;br/&gt;
+        [[Go Down]]
+    ]
 ]
 }</tw-passagedata><tw-passagedata pid="2" name="Beginning" tags="" position="900,375" size="100,100">You work at the top floor of the hospital as an orthopaedic surgeon. One day, while performing surgery, the power goes out in the building. You continue work under the backgup generator, but you begin to hear screams in the distance.
 
@@ -67,81 +80,177 @@ tw-passage {
 (set: $progress = 0)
 (set: $attack = 5)
 
-(set: $seeMetrics = true)</tw-passagedata><tw-passagedata pid="3" name="Continue with the operation" tags="" position="900,500" size="100,100">(set: $karma = $karma + 25)
+(set: $seeMetrics = false)</tw-passagedata><tw-passagedata pid="3" name="Continue with the operation" tags="" position="900,500" size="100,100">{
+(set: $karma = $karma + 25)
 
 You cannot abandon the patient in the middle of an operation. You complete the hip replacement surgery as the noises become increasingly distressing. You are just sewing the patient up when you hear crashing noises and more screams very near the room you are in. 
-
-[[Enter the Hallway]]</tw-passagedata><tw-passagedata pid="4" name="Enter a Nearby Room" tags="" position="775,1125" size="100,100">{
+&lt;br/&gt;
+[[Enter the Hallway]]
+}</tw-passagedata><tw-passagedata pid="4" name="Enter a Nearby Room" tags="" position="775,1125" size="100,100">{
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 1)
 (if: $seeMetrics)[
-	HP: $health
-    Bleed Rate: $bleedRate
-    Attack Strength: $attack
-    Mobility: $mobility
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
 ]
 (if: $health &lt; 1)[
-	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow...
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... 
+] (else:)[
+	(if: (random:0,100) &lt; 30)[
+    	You find a patient bleeding out on the floor of the room! There are medical supplied around the room to help stop bleeding.&lt;br/&gt;
+        [[Help Them]]
+        [[Use the Supplies on Yourself]]
+    ]
 ]
-}</tw-passagedata><tw-passagedata pid="5" name="Enter the Hallway" tags="" position="950,750" size="100,100">(if: (random: 0,100) &gt; $karma)[
-There are zombies in the hallway! They smell you and begin to come after you.
-[[Fight Past Them]]
+}</tw-passagedata><tw-passagedata pid="5" name="Enter the Hallway" tags="" position="950,750" size="100,100">{
+(if: (random: 0,100) &gt; $karma)[
+There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
+[[Fight Past Them]] &lt;br/&gt;
 [[Flee]]
 
 ] (else:) [
-You do not see anything but a dark hallway.
-
+You do not see anything but a dark hallway. &lt;br/&gt;
 [[Continue -&gt; Continue Straight]]
-]</tw-passagedata><tw-passagedata pid="6" name="Fight Past Them" tags="" position="887.5,875" size="100,100">{
+]
+}</tw-passagedata><tw-passagedata pid="6" name="Fight Past Them" tags="" position="887.5,875" size="100,100">{
 (set: $progress = $progress + 2)
 (set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 0,3))
 (if: $damageTaken &gt; 5)[
 	(set: $bleedRate = $bleedRate + 1)
 ]
 (set: $health = $health - $damageTaken)
-}(if: $seeMetrics)[
-	HP: $health
-    Bleed Rate: $bleedRate
-    Damage Taken: $damageTaken
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Damage Taken: $damageTaken &lt;br/&gt;
 ]
 
 (if: $health &lt; 1)[
-	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow...
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
 ] (else:)[
- You manage to fight you way past.
+ 	You manage to fight you way past. 
+ 	(if: $damageTaken)[
+    	 You didn&#39;t get through unscathed though. 
+    ] &lt;br/&gt;
  	(if: (random:0,100) &lt; 33)[
-    	You approach an intersection of hallways
-        [[Turn Left]]
-        [[Turn Right]]
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
  	]
-    [[ Continue Straight]] 
+    [[ Continue Straight]]  &lt;br/&gt;
     [[Enter a Nearby Room]]
-]</tw-passagedata><tw-passagedata pid="7" name="Flee" tags="" position="1012.5,875" size="100,100">{
+]
+}</tw-passagedata><tw-passagedata pid="7" name="Flee" tags="" position="1012.5,875" size="100,100">{
 (set: $progress = $progress + 1)
 (set: $caught = $mobility / 2.5 &lt; (random: 0,40))
 (if: $caught)[
-	You attempt to flee but you were clumsy and got caught, recieving some injuries.
+	You attempt to flee but you were clumsy and got caught, recieving some injuries.&lt;br/&gt;
     	(set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 1,6))
  		 (if: $damageTaken &gt; 5)[
       		(set: $bleedRate = $bleedRate + 1)
   		]
 		(set: $health = $health - $damageTaken)
 ]
-}(if: $seeMetrics)[
-	HP: $health
-    Bleed Rate: $bleedRate
-    Damage Taken: $damageTaken
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Damage Taken: $damageTaken &lt;br/&gt;
 ]
 (if: $health &lt; 1)[
-	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow...
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
 ] (else:)[
- Not dead yet
-]</tw-passagedata><tw-passagedata pid="8" name="Go Investigate" tags="" position="1025,500" size="100,100">(set: $karma = $karma - 10)
+ 	You managed to flee past them with your life. 
+ 	(if: $damageTaken)[
+    	 You were not quite quick enough though and they gave you a few small injuries. 
+    ] &lt;br/&gt;
+ 	(if: (random:0,100) &lt; 33)[
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
+ 	]
+    [[ Continue Straight]]  &lt;br/&gt;
+    [[Enter a Nearby Room]]
+]
+}</tw-passagedata><tw-passagedata pid="8" name="Go Investigate" tags="" position="1025,500" size="100,100">{
+(set: $karma = $karma - 10)
 (set: $attack = $attack + 10)
 
 You grab your electric bone saw and abandon the patient mid surgery. They likely will not survive if you don&#39;t get back quickly. 
-
-[[Enter the Hallway]]</tw-passagedata><tw-passagedata pid="9" name="Turn Left" tags="" position="900,1200" size="100,100"></tw-passagedata><tw-passagedata pid="10" name="Turn Right" tags="" position="1125,1200" size="100,100"></tw-passagedata><tw-passagedata pid="11" name="Exit the Building" tags="" position="1025,1400" size="100,100"></tw-passagedata></tw-storydata>
+&lt;br/&gt;
+[[Enter the Hallway]]
+}</tw-passagedata><tw-passagedata pid="9" name="Turn Left" tags="" position="900,1200" size="100,100"></tw-passagedata><tw-passagedata pid="10" name="Turn Right" tags="" position="1125,1200" size="100,100"></tw-passagedata><tw-passagedata pid="11" name="Exit the Building" tags="" position="1075,1600" size="100,100"></tw-passagedata><tw-passagedata pid="12" name="Help Them" tags="" position="500,1125" size="100,100">{
+(set: $bleedRate = (max:0, $bleedRate - 3))
+(set: $karma = (max:0, $karma - 15))
+(set: $health = (min: 100, $health + 5))
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 1)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else:)[
+	You use the supplies for yourself to slow your bleeding while the patient grows progressively weaker.. &lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+]
+}</tw-passagedata><tw-passagedata pid="13" name="Use the Supplies on Yourself" tags="" position="500,1250" size="100,100">{
+(set: $karma = (min: 100, $karma + 15))
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 1)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else:)[
+	You use the supplies for yourself to slow your bleeding while the patient grows progressively weaker.. &lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+]
+}</tw-passagedata><tw-passagedata pid="14" name="Game Over" tags="" position="925,1600" size="100,100"></tw-passagedata><tw-passagedata pid="15" name="Go Down" tags="" position="800,1300" size="100,100"></tw-passagedata><tw-passagedata pid="16" name="Enter Examination Room" tags="" position="1425,1225" size="100,100">{
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 2)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else:)[
+	$limbLost = (random:1,4)
+    (if: $limbLost = 1)[
+    	Leg
+    ] (else-if: $limbLost = 2)[
+    	Arm
+    ] (else-if: $limbLost = 2)[
+    	Eye
+    ] (else-if: $limbLost = 2)[
+    	Heart
+    ]
+] 
+}</tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
 var require,define;!function(){var e={},r={};require=function(i){var n=e[i];return n&&(r[i]=n[1].apply(void 0,n[0].map(require)),e[i]=void 0),r[i]},(define=function(r,i,n){if("function"==typeof r)return r();e[r]=[i,n]}).amd=!0}();/*!
  * https://github.com/paulmillr/es6-shim
