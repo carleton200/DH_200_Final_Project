@@ -1,0 +1,162 @@
+:: StoryTitle
+DCC
+
+
+:: StoryData
+{
+  "ifid": "75E9DFA1-99A5-45F7-8168-5F1D09B9E008",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Beginning",
+  "zoom": 1
+}
+
+
+:: \ Continue Straight {"position":"1000,1250","size":"100,100"}
+{
+(set: $progress = $progress + 2)
+}(if: $seeMetrics)[
+	HP: $health
+    Bleed Rate: $bleedRate
+    Damage Taken: $damageTaken
+]
+
+
+
+:: Beginning {"position":"900,375","size":"100,100"}
+You work at the top floor of the hospital as an orthopaedic surgeon. One day, while performing surgery, the power goes out in the building. You continue work under the backgup generator, but you begin to hear screams in the distance.
+
+[[Continue with the operation]]
+[[Go Investigate]]
+
+(set: $health = 100)
+(set: $karma = 50)
+(set: $mobility = 80)
+(set: $infectionChance = 0)
+(set: $bleedRate = 0)
+(set: $progress = 0)
+(set: $attack = 5)
+
+(set: $seeMetrics = true)
+
+
+:: Continue with the operation {"position":"900,500","size":"100,100"}
+(set: $karma = $karma + 25)
+
+You cannot abandon the patient in the middle of an operation. You complete the hip replacement surgery as the noises become increasingly distressing. You are just sewing the patient up when you hear crashing noises and more screams very near the room you are in. 
+
+[[Enter the Hallway]] 
+
+
+:: Enter a Nearby Room {"position":"775,1125","size":"100,100"}
+
+
+
+:: Enter the Hallway {"position":"950,750","size":"100,100"}
+(if: (random: 0,100) > $karma)[
+There are zombies in the hallway! They smell you and begin to come after you.
+[[Fight Past Them]]
+[[Flee]]
+
+] (else:) [
+You do not see anything but a dark hallway.
+
+[[Continue -> Continue Straight]]
+]
+
+
+:: Fight Past Them {"position":"887.5,875","size":"100,100"}
+{
+(set: $progress = $progress + 2)
+(set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 0,3))
+(if: $damageTaken > 5)[
+	(set: $bleedRate = $bleedRate + 1)
+]
+(set: $health = $health - $damageTaken)
+}(if: $seeMetrics)[
+	HP: $health
+    Bleed Rate: $bleedRate
+    Damage Taken: $damageTaken
+]
+
+(if: $health < 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow...
+] (else:)[
+ You manage to fight you way past.
+ 	(if: (random:0,100) < 33)[
+    	You approach an intersection of hallways
+        [[Turn Left]]
+        [[Turn Right]]
+ 	]
+    [[ Continue Straight]] 
+    [[Enter a Nearby Room]]
+]
+
+
+:: Flee {"position":"1012.5,875","size":"100,100"}
+{
+(set: $progress = $progress + 1)
+(set: $caught = $mobility / 2.5 < (random: 0,40))
+(if: $caught)[
+	You attempt to flee but you were clumsy and got caught, recieving some injuries.
+    	(set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 1,6))
+ 		 (if: $damageTaken > 5)[
+      		(set: $bleedRate = $bleedRate + 1)
+  		]
+		(set: $health = $health - $damageTaken)
+]
+}(if: $seeMetrics)[
+	HP: $health
+    Bleed Rate: $bleedRate
+    Damage Taken: $damageTaken
+]
+(if: $health < 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow...
+] (else:)[
+ Not dead yet
+]
+
+
+:: Go Investigate {"position":"1025,500","size":"100,100"}
+(set: $karma = $karma - 10)
+(set: $attack = $attack + 10)
+
+You grab your electric bone saw and abandon the patient mid surgery. They likely will not survive if you don't get back quickly. 
+
+[[Enter the Hallway]]
+
+
+:: Turn Left {"position":"900,1125","size":"100,100"}
+
+
+
+:: Turn Right {"position":"1125,1125","size":"100,100"}
+
+
+
+:: StoryStylesheet [stylesheet]
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Felipa&display=swap');
+
+tw-passage {
+  font-family: Audiowide;
+  font: white;
+  background : #454545;
+  
+}
+
+.smallCap {
+	font-size: 0.5em;
+}
+.centCap {
+  text-align: center;
+}
+.photos {
+  	display: flex;
+	margin-bottom: 5px;
+  	padding: 5px;
+  	justify-content: flex-end;
+}
+.mainImages {
+	display: flex;
+  	justify-content: center;
+}
