@@ -233,7 +233,9 @@ Bleed Rate: $bleedRate
 Attack Strength: $attack 
 Mobility: $mobility 
 Karma: $karma
-Chance of Infection: $infectionChance</tw-passagedata><tw-passagedata pid="8" name="Fight Past Them" tags="" position="900,875" size="100,100">{
+Chance of Infection: $infectionChance
+
+&lt;a href=&quot;https://carleton200.github.io/DH_200_Final_Project/&quot; target=&quot;_blank&quot; class=&quot;html-btn&quot;&gt;Back to Start&lt;/a&gt;</tw-passagedata><tw-passagedata pid="8" name="Fight Past Them" tags="" position="900,875" size="100,100">{
 (set: $progress = $progress + 2)
 (set: $damageTaken = ((100 - $mobility / 5 - $attack * 2) / 50 * (random: 0,10)))
 (if: $damageTaken &gt; 5)[
@@ -318,7 +320,9 @@ Chance of Infection: $infectionChance
 Final Progress: $pPerc %
 (if: $pPerc &gt; 70)[
 	You were so close...
-]</tw-passagedata><tw-passagedata pid="11" name="Go Down" tags="" position="800,1300" size="100,100">{
+]
+
+&lt;a href=&quot;https://carleton200.github.io/DH_200_Final_Project/&quot; target=&quot;_blank&quot; class=&quot;html-btn&quot;&gt;Back to Start&lt;/a&gt;</tw-passagedata><tw-passagedata pid="11" name="Go Down" tags="" position="800,1300" size="100,100">{
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 5)
 (if: (random:0,100) &lt; $infectionChance)[
