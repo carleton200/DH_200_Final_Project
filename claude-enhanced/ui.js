@@ -125,10 +125,9 @@
     { key: 'infection', label: 'Infection', max: 100, color: '#c7d65a', suffix: '%' },
     { key: 'attack', label: 'Attack', max: 100, color: 'var(--coral)' },
     { key: 'mobility', label: 'Mobility', max: 100, color: 'var(--scrubs)' },
-    { key: 'karma', label: 'Karma', max: 100, color: 'var(--gold)' },
   ];
-  const GOOD_WHEN_UP = { hp: true, attack: true, mobility: true, karma: true, bleed: false, infection: false, threat: false };
-  const CHIP_NAME = { hp: 'HP', bleed: 'Bleeding', infection: 'Infection', attack: 'Attack', mobility: 'Mobility', karma: 'Karma', threat: 'Horde' };
+  const GOOD_WHEN_UP = { hp: true, attack: true, mobility: true, bleed: false, infection: false };
+  const CHIP_NAME = { hp: 'HP', bleed: 'Bleeding', infection: 'Infection', attack: 'Attack', mobility: 'Mobility' };
 
   function renderGame(first) {
     const v = E.view(s);
@@ -139,11 +138,16 @@
     for (let i = 0; i < cfg.floors; i++) floors += '<span class="floor-cell ' + (i < s.floor ? 'done' : i === s.floor ? 'now' : '') + '">' + (cfg.floors - i) + '</span>';
     $('#floors').innerHTML = floors;
     const cards = s.plan.floors[s.floor];
-    $('#floor-name').textContent = 'Floor ' + (cfg.floors - s.floor) + ' · ' + v.floor.name;
+    $('#floor-name').innerHTML = 'Floor ' + (cfg.floors - s.floor) + ' · <span class="long">' + esc(v.floor.name) + '</span><span class="short">' + esc(v.floor.short) + '</span>';
     $('#pips').innerHTML = cards.map((_, i) => '<i class="pip ' + (i < s.step ? 'done' : '') + '"></i>').join('') + '<i class="pip stairs ' + (s.step >= cards.length ? 'done' : '') + '" title="Stairs"></i>';
     const lvl = Math.min(4, Math.floor(s.threat) + 1);
     $('#horde-word').textContent = E.describe('threat', s.threat);
     document.querySelectorAll('.horde-bar i').forEach((el, i) => el.classList.toggle('on', i < lvl));
+
+    const hpNow = Math.max(0, s.hp);
+    $('#mini-hud').innerHTML = s.biometrics
+      ? '<span>HP <b style="color:' + (hpNow > 50 ? 'var(--toxic)' : hpNow > 25 ? 'var(--gold)' : 'var(--blood)') + '">' + hpNow + '</b></span><span style="color:var(--blood-soft)">Bleed ' + s.bleed + '</span>'
+      : '<span class="muted">Vitals</span><span class="muted">No signal</span>';
 
     // scene
     const sceneEl = $('#scene');
@@ -165,7 +169,8 @@
     if (r && (r.text.length || r.deltas.length)) {
       const hpd = r.deltas.find((d) => d.stat === 'hp');
       outcome.className = 'outcome fade-in' + (hpd ? (hpd.amount < 0 ? ' bad' : ' good') : '');
-      outcome.innerHTML = r.text.map((t) => '<p>' + esc(t) + '</p>').join('') + (r.deltas.length ? '<div class="chips">' + r.deltas.map(chip).join('') + '</div>' : '');
+      const chips = r.deltas.map(chip).filter(Boolean);
+      outcome.innerHTML = r.text.map((t) => '<p>' + esc(t) + '</p>').join('') + (chips.length ? '<div class="chips">' + chips.join('') + '</div>' : '');
       outcome.hidden = false;
     } else {
       outcome.hidden = true;
@@ -214,36 +219,41 @@
       const it = E.ITEMS[d.item];
       return '<span class="chip ' + (d.amount > 0 ? 'good' : 'bad') + '">' + (d.amount > 0 ? '+' : '−') + Math.abs(d.amount) + ' ' + esc(it.name) + '</span>';
     }
+    // Stat changes can only be measured with biometrics. Karma and the horde never appear as numbers.
+    if (!s.biometrics || !CHIP_NAME[d.stat]) return '';
     const up = d.amount > 0;
     const good = GOOD_WHEN_UP[d.stat] ? up : !up;
-    // Without biometrics you feel the change but cannot measure it.
-    const showNum = s.biometrics || d.stat === 'karma';
-    const val = showNum ? (up ? '+' : '−') + (d.stat === 'threat' ? '' : Math.abs(d.amount)) : (up ? '▲' : '▼');
-    return '<span class="chip ' + (good ? 'good' : 'bad') + '">' + esc(CHIP_NAME[d.stat]) + ' ' + (d.stat === 'threat' ? (up ? '▲' : '▼') : val) + '</span>';
+    return '<span class="chip ' + (good ? 'good' : 'bad') + '">' + esc(CHIP_NAME[d.stat]) + ' ' + (up ? '+' : '−') + Math.abs(d.amount) + '</span>';
   }
 
   function renderSidebar() {
     const exact = s.biometrics;
     const vitals = $('#vitals-panel');
-    vitals.classList.toggle('vague', !exact);
-    const hp = Math.max(0, s.hp);
-    const color = hp > 50 ? 'var(--toxic)' : hp > 25 ? 'var(--gold)' : 'var(--blood)';
-    vitals.style.setProperty('--hp-color', color);
-    vitals.style.setProperty('--beat', (0.9 + (hp / 100) * 1.6).toFixed(2) + 's');
-    const hpNum = $('#hp-num');
-    hpNum.textContent = exact ? hp : E.describe('hp', hp);
-    hpNum.classList.toggle('word', !exact);
-    $('#hp-bar').style.setProperty('--v', hp + '%');
+    vitals.classList.toggle('offline', !exact);
     const biom = $('#biom');
     biom.className = 'biom' + (exact ? ' on' : '');
-    biom.textContent = exact ? 'Biometrics online: exact readings and fight odds.' : 'Biometrics offline. Install a bionic eye or arm for exact readings.';
-
-    $('#stats').innerHTML = STAT_ROWS.map((r) => {
-      const val = s[r.key];
-      const pct = Math.max(0, Math.min(100, (val / r.max) * 100));
-      const shown = exact || r.key === 'karma' ? val + (r.suffix || '') : E.describe(r.key, val);
-      return '<div class="stat"><span>' + r.label + '</span><span class="bar"><i style="--v:' + pct + '%;--c:' + r.color + '"></i></span><span class="val">' + esc(shown) + '</span></div>';
-    }).join('');
+    biom.textContent = exact
+      ? 'Biometrics online: live vitals and a scanner read on every fight.'
+      : 'Biometrics offline. Install a bionic eye or bionic arm to read your vitals.';
+    if (!exact) {
+      // No implant, no readings: nothing on the monitor may hint at the real numbers.
+      vitals.style.removeProperty('--hp-color');
+      vitals.style.removeProperty('--beat');
+      $('#hp-num').textContent = '';
+      $('#hp-bar').style.setProperty('--v', '0%');
+      $('#stats').innerHTML = '';
+    } else {
+      const hp = Math.max(0, s.hp);
+      vitals.style.setProperty('--hp-color', hp > 50 ? 'var(--toxic)' : hp > 25 ? 'var(--gold)' : 'var(--blood)');
+      vitals.style.setProperty('--beat', (0.9 + (hp / 100) * 1.6).toFixed(2) + 's');
+      $('#hp-num').textContent = hp;
+      $('#hp-bar').style.setProperty('--v', hp + '%');
+      $('#stats').innerHTML = STAT_ROWS.map((r) => {
+        const val = s[r.key];
+        const pct = Math.max(0, Math.min(100, (val / r.max) * 100));
+        return '<div class="stat"><span>' + r.label + '</span><span class="bar"><i style="--v:' + pct + '%;--c:' + r.color + '"></i></span><span class="val">' + esc(val + (r.suffix || '')) + '</span></div>';
+      }).join('');
+    }
 
     // body diagram
     const bodyEl = $('#body');
@@ -289,7 +299,7 @@
 
   function journalLine(e) {
     const hp = e.deltas && e.deltas[0];
-    return '<li><span class="t">T' + e.turn + '</span><span>' + esc(e.text) + (hp && hp.amount < 0 && !/HP\)/.test(e.text) ? ' <span class="dmg">(' + hp.amount + ' HP)</span>' : '') + '</span></li>';
+    return '<li><span class="t">T' + e.turn + '</span><span>' + esc(e.text) + (hp && hp.amount < 0 && e.bio ? ' <span class="dmg">(' + hp.amount + ' HP)</span>' : '') + '</span></li>';
   }
 
   /* ------------------------------------------------------------- input */
@@ -383,7 +393,6 @@
       ['Turns', s.turn],
       ['Zombies dropped', s.kills],
       ['Patients saved', s.saved],
-      ['Karma', s.karma],
       ['Damage taken', s.damageTaken],
       ['Bleeding', s.bleed],
       ['Infection', s.infection + '%'],
@@ -426,11 +435,8 @@
       for (const id of E.PART_OPTIONS[part]) {
         const imp = E.IMPLANTS[id];
         if (imp.asis) continue;
-        const fx = [];
-        for (const [k, label] of [['hp', 'HP'], ['bleed', 'Bleeding'], ['attack', 'Attack'], ['mobility', 'Mobility'], ['infection', 'Infection']]) {
-          if (imp.fx[k]) fx.push(label + ' ' + (imp.fx[k] > 0 ? '+' : '−') + Math.abs(imp.fx[k]));
-        }
-        if (imp.fx.biometrics) fx.push('Biometrics');
+        const fx = E.effectWords(imp.fx);
+        if (imp.fx.biometrics) fx.push('Turns on biometrics');
         if (imp.fx.hearing === 1) fx.push('Hear intersections');
         if (imp.fx.hearing === 2) fx.push('Hear ahead');
         html += '<article class="codex-card' + (found.has(id) ? ' found' : '') + '"><header>' + A.icon(id) + '<div><h4>' + esc(imp.name) + '</h4><span class="sub">' + esc(imp.sub) + '</span></div></header>' +

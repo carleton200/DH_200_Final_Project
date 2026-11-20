@@ -65,19 +65,19 @@
   const DIFFICULTY = {
     intern: {
       id: 'intern', label: 'Intern', blurb: 'First week on the job. Four floors, gentler bites and a stocked pocket.',
-      floors: 4, floorLength: 5, zombieCards: 2, injuries: 2, caches: 1,
+      floors: 4, floorLength: 5, zombieCards: 2, injuries: 3, caches: 1,
       dmg: 0.9, infect: 0.7, threatPerTurn: 0.08, finalHorde: 2, roomLimit: 2,
       startItems: { bandage: 1, antibiotics: 1, painkillers: 1, stim: 1 }, scoreMult: 1,
     },
     resident: {
       id: 'resident', label: 'Resident', blurb: 'The intended experience. Five floors, and every choice costs something.',
-      floors: 5, floorLength: 5, zombieCards: 2, injuries: 3, caches: 1,
+      floors: 5, floorLength: 5, zombieCards: 2, injuries: 4, caches: 1,
       dmg: 0.95, infect: 1, threatPerTurn: 0.08, finalHorde: 2, roomLimit: 2,
       startItems: { bandage: 1, painkillers: 1 }, scoreMult: 1.5,
     },
     attending: {
-      id: 'attending', label: 'Attending', blurb: 'Six floors, four injuries, one bandage. For the steady-handed.',
-      floors: 6, floorLength: 5, zombieCards: 2, injuries: 4, caches: 1,
+      id: 'attending', label: 'Attending', blurb: 'Six floors, every body part at risk, one bandage. For the steady-handed.',
+      floors: 6, floorLength: 5, zombieCards: 2, injuries: 5, caches: 1,
       dmg: 1.1, infect: 1.15, threatPerTurn: 0.07, finalHorde: 3, roomLimit: 2,
       startItems: { bandage: 1 }, scoreMult: 2,
     },
@@ -100,9 +100,9 @@
     quiet: ['Ambulance bay doors bang in the wind. Daylight is close.', 'The triage board reads: WAIT TIME: FOREVER.'] };
 
   const ITEMS = {
-    bandage: { name: 'Bandage', icon: 'bandage', desc: 'Bleeding −2, HP +3.' },
-    antibiotics: { name: 'Antibiotics', icon: 'pills', desc: 'Infection risk −20.' },
-    painkillers: { name: 'Painkillers', icon: 'syringe', desc: 'HP +18.' },
+    bandage: { name: 'Bandage', icon: 'bandage', desc: 'Slows bleeding and patches you up a little.' },
+    antibiotics: { name: 'Antibiotics', icon: 'pills', desc: 'Fights off infection.' },
+    painkillers: { name: 'Painkillers', icon: 'syringe', desc: 'Restores a good chunk of health.' },
     stim: { name: 'Adrenaline', icon: 'stim', desc: 'In a fight: escape for sure, and the horde loses your trail.' },
   };
   const ITEM_WEIGHTS = [['bandage', 40], ['antibiotics', 26], ['painkillers', 24], ['stim', 10]];
@@ -375,8 +375,8 @@
           'You work on the top floor of St. Lazarus General as an orthopaedic surgeon. Tonight, halfway through a hip replacement, the power dies.',
           'The backup generator kicks in and you keep working. Then the screaming starts, far off at first, and closer every minute.',
         ];
-        ch('operate', 'Finish the operation', { hint: 'Karma +20. Good people get shown the service stairs.', tone: 'good' });
-        ch('investigate', 'Grab the bone saw and investigate', { hint: 'Attack +15, karma −10. The patient is on their own.', tone: 'bad' });
+        ch('operate', 'Finish the operation', { hint: 'The right thing to do. People will remember it.', tone: 'good' });
+        ch('investigate', 'Grab the bone saw and investigate', { hint: 'A weapon in your hands. The patient is on their own.', tone: 'bad' });
         break;
 
       case 'corridor': {
@@ -394,7 +394,7 @@
         } else {
           v.text = [n.text || pickFlavor(fl.quiet, s.turn)];
           const next = cards[s.step];
-          ch('advance', 'Push on down the hallway', { hint: s.hearing >= 2 ? hearHint(next) : 'Room ' + (s.step + 1) + ' of ' + cards.length + ' on this floor.' });
+          ch('advance', 'Push on down the hallway', { hint: s.hearing >= 2 ? hearHint(next) : 'Hallway section ' + (s.step + 1) + ' of ' + cards.length + ' on this floor.' });
         }
         const left = cfg.roomLimit - s.roomsSearched;
         ch('search', 'Search a nearby room', {
@@ -409,13 +409,12 @@
         v.count = n.count;
         v.title = n.final ? 'The Last Stand' : n.count === 1 ? 'A Zombie!' : n.count + ' Zombies!';
         v.text = [n.text];
-        const [lo, hi] = fightRange(s, n.count);
         const p = fleeChance(s, n.count);
         ch('fight', n.final ? 'Fight your way to the doors' : 'Fight past them', {
-          hint: s.biometrics ? 'Projected damage ' + lo + '–' + hi + ' HP.' : vagueFight(s, n.count), tone: 'bad' });
+          hint: s.biometrics ? scanFight(s, n.count) : vagueFight(s, n.count), tone: 'bad' });
         ch('flee', n.final ? 'Sprint for the doors' : 'Run for it', {
-          hint: s.biometrics ? Math.round(p * 100) + '% chance to escape. ' + (n.final ? 'If caught, try again.' : 'Survivors keep hunting you.') : vagueFlee(p) });
-        if (s.inventory.stim > 0) ch('stim', 'Jab adrenaline and sprint', { hint: 'Uses 1 Adrenaline. A guaranteed clean escape.', tone: 'good' });
+          hint: (s.biometrics ? scanFlee(p) : vagueFlee(p)) + (n.final ? ' If caught, try again.' : ' Survivors keep hunting you.') });
+        if (s.inventory.stim > 0) ch('stim', 'Jab adrenaline and sprint', { hint: 'Uses an Adrenaline. A guaranteed clean escape.', tone: 'good' });
         break;
       }
 
@@ -453,16 +452,16 @@
         v.scene = 'patient';
         v.title = 'A Patient';
         v.text = ['A patient is bleeding out on the floor, eyes wide with fear. There are medical supplies around the room, enough for one person.'];
-        ch('help', 'Help them', { hint: 'Karma +15. Takes time.', tone: 'good' });
-        ch('self', 'Use the supplies on yourself', { hint: 'Bleeding −2, HP +8, karma −15.', tone: 'bad' });
-        ch('leave', 'Back away quietly', { hint: 'Karma −5.' });
+        ch('help', 'Help them', { hint: 'The right thing to do. Takes time.', tone: 'good' });
+        ch('self', 'Use the supplies on yourself', { hint: 'Patch yourself up instead. They will not make it.', tone: 'bad' });
+        ch('leave', 'Back away quietly', { hint: 'Not your problem. Or is it?' });
         break;
 
       case 'cabinet':
         v.scene = 'cabinet';
         v.title = 'Locked Drug Cabinet';
         v.text = ['A steel narcotics cabinet, locked and untouched. Through the glass: antibiotics and painkillers.'];
-        ch('smash', 'Smash it open', { hint: s.biometrics ? Math.round(cabinetChance(s) * 100) + '% chance. Fail and you hurt yourself.' : s.attack >= 30 ? 'You feel strong enough.' : 'Could hurt.' });
+        ch('smash', 'Smash it open', { hint: s.biometrics ? scanCabinet(s) : s.attack >= 30 ? 'You feel strong enough.' : 'Could hurt.' });
         ch('leave', 'Leave it', {});
         break;
 
@@ -500,21 +499,50 @@
     if (mid >= 9) return 'You will take some hits.';
     return 'You can handle this.';
   }
+  function scanFight(s, count) {
+    const [lo, hi] = fightRange(s, count);
+    if (hi >= s.hp) return 'Scanner: this fight could kill you.';
+    if ((lo + hi) / 2 >= 16) return 'Scanner: heavy damage expected.';
+    if ((lo + hi) / 2 >= 9) return 'Scanner: moderate damage expected.';
+    return 'Scanner: minor damage expected.';
+  }
+  function scanFlee(p) {
+    if (p >= 0.8) return 'Scanner: escape is very likely.';
+    if (p >= 0.6) return 'Scanner: escape is likely.';
+    if (p >= 0.4) return 'Scanner: a coin flip.';
+    return 'Scanner: escape is unlikely.';
+  }
+  function scanCabinet(s) {
+    const c = cabinetChance(s);
+    if (c >= 0.9) return 'Scanner: your arm can easily break it.';
+    if (c >= 0.6) return 'Scanner: good odds. Fail and you hurt yourself.';
+    return 'Scanner: poor odds. Fail and you hurt yourself.';
+  }
   function vagueFlee(p) {
     if (p >= 0.75) return 'Your legs feel quick.';
-    if (p >= 0.5) return 'Maybe. Survivors keep hunting you.';
+    if (p >= 0.5) return 'Maybe.';
     return 'You are slow. Risky.';
   }
-  const STAT_NAMES = { hp: 'HP', bleed: 'Bleeding', infection: 'Infection', attack: 'Attack', mobility: 'Mobility', karma: 'Karma' };
+  // Describe what an implant does in words, never exact numbers.
+  function effectWords(fx) {
+    const out = [];
+    if (fx.hp > 0) out.push(fx.hp >= 20 ? 'Restores a lot of health' : 'Restores a little health');
+    if (fx.bleed < 0) out.push('Slows bleeding');
+    if (fx.attack > 0) out.push(fx.attack >= 12 ? 'Hits much harder' : 'Hits a little harder');
+    if (fx.attack < 0) out.push(fx.attack <= -12 ? 'Much weaker in a fight' : 'A little weaker in a fight');
+    if (fx.mobility > 0) out.push('Quicker on your feet');
+    if (fx.mobility < 0) out.push(fx.mobility <= -12 ? 'Much slower' : 'A little slower');
+    if (fx.infection > 0) out.push(fx.infection >= 6 ? 'High infection risk' : 'Some infection risk');
+    if (fx.infection < 0) out.push('Lowers infection risk');
+    return out;
+  }
   function fxHint(fx, asis) {
     const parts = [];
-    if (asis) parts.push(fx.hp === undefined && !fx.infection ? 'Heart keeps failing (−3 HP per turn)' : 'Wound stays open');
-    for (const k of ['hp', 'bleed', 'attack', 'mobility', 'infection']) {
-      if (fx[k]) parts.push(STAT_NAMES[k] + ' ' + (fx[k] > 0 ? '+' : '−') + Math.abs(fx[k]));
-    }
+    if (asis) parts.push(fx.hp === undefined && !fx.infection ? 'Your heart keeps failing' : 'The wound stays open');
+    parts.push(...effectWords(fx));
     if (!asis && !fx.cureHeart) parts.unshift('Seals the wound');
     if (fx.cureHeart) parts.unshift('Restores your heartbeat');
-    if (fx.biometrics) parts.push('Biometrics ON');
+    if (fx.biometrics) parts.push('Turns on biometrics');
     if (fx.hearing === 1) parts.push('Hear what waits at intersections');
     if (fx.hearing === 2) parts.push('Hear what waits ahead');
     return parts.join(' · ');
@@ -707,7 +735,7 @@
         if (w.bleed) apply(s, { bleed: w.bleed });
         if (w.failing) s.heartFailing = true;
         s.parts[part] = 'injured';
-        out.push('You start to feel faint and sick. An old wound tears open. There is an examination room right here.');
+        out.push(part === 'heart' ? 'Your chest seizes up mid-stride and you start to feel faint. There is an examination room right here.' : pickFlavor(['You start to feel faint and sick. Something is badly wrong.', 'A zombie lunges out of a doorway, tears at you and is gone before you can react.', 'You slip on something wet and go down hard.'], card.flavor) + ' There is an examination room right here.');
         s.node = { type: 'exam', part };
         return 'Injured: ' + PARTS[part].name;
       }
@@ -797,7 +825,7 @@
       bite(dmg);
       if (n.final && s.hp > 0) return win(s, out, 'Fought through the final horde');
       s.node = { type: 'corridor', text: 'Bodies at your feet. You catch your breath.' };
-      return 'Fought ' + n.count + ' zombie' + (n.count === 1 ? '' : 's') + (dmg ? ' (−' + dmg + ' HP)' : '');
+      return 'Fought ' + n.count + ' zombie' + (n.count === 1 ? '' : 's') + '';
     }
     // flee
     if (rnd(s) < fleeChance(s, n.count)) {
@@ -813,12 +841,12 @@
     bite(dmg);
     if (n.final) {
       if (s.hp > 0) out.push('They are still between you and the doors.');
-      return 'Caught at the doors (−' + dmg + ' HP)';
+      return 'Caught at the doors';
     }
     s.fled += n.count;
     apply(s, { threat: 0.12 * n.count });
     s.node = { type: 'corridor', text: 'You limp away from them.' };
-    return 'Caught while fleeing (−' + dmg + ' HP)';
+    return 'Caught while fleeing';
   }
 
   function win(s, out, line) {
@@ -856,7 +884,7 @@
     }
     const deltas = diff(before, s);
     s.result = { text: out, deltas };
-    if (logLine) s.log.push({ turn: s.turn, floor: s.floor, text: logLine, deltas: deltas.filter(d => d.stat === 'hp') });
+    if (logLine) s.log.push({ turn: s.turn, floor: s.floor, text: logLine, bio: s.biometrics, deltas: deltas.filter(d => d.stat === 'hp') });
     if (s.log.length > 80) s.log.shift();
   }
 
@@ -924,7 +952,7 @@
 
   return {
     VERSION, DIFFICULTY, FLOORS, ITEMS, PARTS, IMPLANTS, PART_OPTIONS,
-    newGame, view, choose, useItem, canUse, score, describe, floorInfo,
+    newGame, view, choose, effectWords, useItem, canUse, score, describe, floorInfo,
     fightRange, fleeChance, randomSeed, dailySeed, serialize, deserialize,
   };
 });

@@ -328,7 +328,7 @@
       '<rect class="bp bp-leg-other" x="62" y="118" width="18" height="60" rx="8"/>' +
       '<rect class="bp bp-leg" data-part="leg" x="40" y="118" width="18" height="60" rx="8"/>' +
       '<path class="bp bp-torso" d="M34 66q0-12 14-12h24q14 0 14 12l2 58H32z"/>' +
-      '<path class="bp bp-heart" data-part="heart" d="M66 86c-9-6-8-14-3-14 2 0 3 2 3 2s1-2 3-2c5 0 6 8-3 14z"/>' +
+      '<path class="bp bp-heart" data-part="heart" stroke-width="2" d="M66 90c-13-8-12-20-4-20 3 0 4 3 4 3s1-3 4-3c8 0 9 12-4 20z"/>' +
       '<path d="M86 64l18 34-2 30M34 64l-18 34 2 30" fill="none" stroke-width="15"/>' +
       '<path class="bp-limb bp-arm" data-part="arm" d="M86 64l18 34-2 30" fill="none" stroke-width="8"/>' +
       '<path class="bp-limb bp-arm-other" d="M34 64l-18 34 2 30" fill="none" stroke-width="8"/>' +

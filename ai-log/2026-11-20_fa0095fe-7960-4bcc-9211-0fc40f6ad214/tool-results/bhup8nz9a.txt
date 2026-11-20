@@ -1,0 +1,906 @@
+.claude/settings.json
+.gitignore
+Twine Backups/backup_1.twee
+Twine Backups/backup_2.twee
+Twine Backups/backup_3.twee
+Twine Backups/backup_4.twee
+ai-log/2026-11-19_893c2166-8813-447d-ab42-97980c16eb5e.jsonl
+ai-log/AI-Use-Log.html
+docs/superpowers/plans/2026-11-19-landing-page.md
+docs/superpowers/specs/2026-11-19-landing-page-design.md
+hand-built/index.html
+index.html
+total 57
+drwxr-xr-x 1 carle 197609     0 Nov 19 19:08 .
+drwxr-xr-x 1 carle 197609     0 Nov 18 09:28 ..
+drwxr-xr-x 1 carle 197609     0 Nov 19 14:18 .claude
+drwxr-xr-x 1 carle 197609     0 Nov 20 09:13 .git
+-rw-r--r-- 1 carle 197609    33 Nov 19 14:18 .gitignore
+drwxr-xr-x 1 carle 197609     0 Nov 19 21:38 Twine Backups
+drwxr-xr-x 1 carle 197609     0 Nov 19 19:08 ai-log
+drwxr-xr-x 1 carle 197609     0 Nov 19 14:18 docs
+drwxr-xr-x 1 carle 197609     0 Nov 19 21:38 hand-built
+-rw-r--r-- 1 carle 197609 37638 Nov 19 19:08 index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surgical Apocalypse</title>
+<meta name="description" content="Surgical Apocalypse: a surgeon, a zombie horde and a tray of implants. Play the hand-built game or the Claude Code enhanced version.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120c24'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%23a8f04e'/%3E%3Cpath d='M27 16h10v11h11v10H37v11H27V37H16V27h11z' fill='%23ff4d5e' stroke='%23120c24' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Creepster&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #120c24;
+    --night-top: #120b2a;
+    --night-low: #4a2a6e;
+    --ground: #120c24;
+    --panel: #2a1f52;
+    --bone: #f6f0d8;
+    --toxic: #a8f04e;
+    --toxic-deep: #5fae2a;
+    --blood: #ff4d5e;
+    --gold: #ffd23f;
+    --scrubs: #2fb7a8;
+    --coral: #e8825e;
+    --display: "Creepster", Impact, "Arial Black", fantasy;
+    --comic: "Bangers", Impact, "Arial Black", sans-serif;
+    --body: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--bone);
+    font-family: var(--body);
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-x: hidden;
+    padding-bottom: 96px; /* room so the fixed log button never covers the footer */
+  }
+
+  a { color: inherit; }
+
+  a:focus-visible {
+    outline: 4px solid var(--gold);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(28px, 6vw, 72px) 16px 250px;
+    background:
+      radial-gradient(1.5px 1.5px at 8% 12%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 19% 31%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 31% 9%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 44% 22%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 57% 6%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 66% 36%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 78% 14%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 91% 27%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 96% 7%, #fff 50%, transparent 51%),
+      linear-gradient(to bottom, var(--night-top) 0%, #2a1a52 60%, var(--night-low) 100%);
+  }
+
+  .skyline {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 260px;
+    display: block;
+  }
+
+  .skyline .lit { animation: flicker 5s steps(1) infinite; }
+  .skyline .lit:nth-of-type(3n) { animation-delay: -2s; animation-duration: 7s; }
+  .skyline .lit:nth-of-type(4n) { animation-delay: -3.5s; }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    align-items: center;
+    gap: 24px;
+  }
+
+  .kicker {
+    display: inline-block;
+    margin: 0 0 10px;
+    padding: 4px 12px;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: var(--comic);
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.9rem, 12.5vw, 6.4rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-shadow:
+      3px 3px 0 var(--ink), -3px 3px 0 var(--ink), 3px -3px 0 var(--ink), -3px -3px 0 var(--ink),
+      0 3px 0 var(--ink), 0 -3px 0 var(--ink), 3px 0 0 var(--ink), -3px 0 0 var(--ink),
+      7px 8px 0 rgba(0, 0, 0, 0.55);
+    animation: wobble 6s ease-in-out infinite;
+    transform-origin: 20% 60%;
+  }
+
+  h1 span { display: block; }
+  h1 .w1 { color: var(--toxic); }
+  h1 .w2 { color: var(--blood); }
+
+  .drips {
+    display: block;
+    width: min(100%, 520px);
+    height: 44px;
+    margin-top: 2px;
+  }
+
+  .tagline {
+    margin: 10px 0 4px;
+    max-width: 34ch;
+    font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+    font-weight: 800;
+    text-shadow: 0 2px 0 var(--ink);
+  }
+
+  .subline {
+    margin: 0 0 26px;
+    max-width: 44ch;
+    color: #cfc6ee;
+    text-shadow: 0 2px 0 var(--ink);
+  }
+
+  /* ---------- Game buttons ---------- */
+
+  .play {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    max-width: 700px;
+  }
+
+  .play-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    text-decoration: none;
+    border: 4px solid var(--ink);
+    border-radius: 16px;
+    box-shadow: 7px 7px 0 var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .play-btn:hover,
+  .play-btn:focus-visible {
+    transform: translate(-3px, -3px) rotate(0deg);
+    box-shadow: 10px 10px 0 var(--ink);
+  }
+
+  .play-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .play-btn svg { flex: none; width: 58px; height: 58px; }
+
+  .play-btn .label {
+    display: block;
+    font-family: var(--comic);
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+  }
+
+  .play-btn .name {
+    display: block;
+    font-family: var(--comic);
+    font-size: clamp(1.45rem, 2.6vw, 1.8rem);
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+  }
+
+  .play-btn .desc {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  /* hand-built: patched together */
+  .play-btn.hand {
+    background: var(--bone);
+    color: var(--ink);
+    transform: rotate(-1.5deg);
+  }
+
+  .play-btn.hand::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 3px dashed #8a6f4d;
+    border-radius: 9px;
+    pointer-events: none;
+  }
+
+  .play-btn.hand::after {
+    content: "";
+    position: absolute;
+    top: -12px;
+    right: 22px;
+    width: 64px;
+    height: 22px;
+    background: #f3c9a0;
+    border: 3px solid var(--ink);
+    border-radius: 4px;
+    transform: rotate(8deg);
+    background-image: radial-gradient(#c79872 1.5px, transparent 2px);
+    background-size: 8px 8px;
+  }
+
+  /* Claude: upgraded and glowing */
+  .play-btn.claude {
+    background: linear-gradient(135deg, #3a1d4f 0%, #5a2748 55%, #b5553c 130%);
+    color: #fff6ea;
+    transform: rotate(1deg);
+    border-color: var(--ink);
+    box-shadow: 7px 7px 0 var(--ink), 0 0 0 3px var(--coral), 0 0 28px 4px rgba(232, 130, 94, 0.55);
+    animation: glow 2.8s ease-in-out infinite;
+  }
+
+  .play-btn.claude:hover,
+  .play-btn.claude:focus-visible {
+    box-shadow: 10px 10px 0 var(--ink), 0 0 0 3px var(--gold), 0 0 40px 8px rgba(255, 210, 63, 0.6);
+  }
+
+  .play-btn.claude .label { color: var(--gold); opacity: 1; }
+
+  /* ---------- Surgeon ---------- */
+
+  .surgeon-wrap {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 360px);
+  }
+
+  .moon {
+    position: absolute;
+    left: 50%;
+    top: 2%;
+    width: 96%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 28%, rgba(60, 110, 30, 0.35) 0 7%, transparent 7.5%),
+      radial-gradient(circle at 68% 22%, rgba(60, 110, 30, 0.3) 0 4.5%, transparent 5%),
+      radial-gradient(circle at 76% 62%, rgba(60, 110, 30, 0.3) 0 9%, transparent 9.5%),
+      radial-gradient(circle at 22% 70%, rgba(60, 110, 30, 0.28) 0 5%, transparent 5.5%),
+      radial-gradient(circle at 40% 35%, #e9ffb0, #b9ee62 55%, #86c93a 100%);
+    box-shadow: 0 0 0 5px var(--ink), 0 0 70px 18px rgba(168, 240, 78, 0.45);
+    animation: moonpulse 5s ease-in-out infinite;
+  }
+
+  .surgeon {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .sparkle { animation: twinkle 1.8s ease-in-out infinite; transform-origin: 322px 22px; }
+
+  /* ---------- Horde ---------- */
+
+  .horde {
+    position: relative;
+    z-index: 2;
+    margin-top: -104px;
+    height: 150px;
+    padding: 0 3vw 6px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, transparent 104px, var(--ground) 104px);
+    pointer-events: none;
+  }
+
+  .zombie {
+    flex: none;
+    width: 84px;
+    height: 140px;
+    transform-origin: 50% 100%;
+    animation: shamble 1.6s ease-in-out infinite;
+  }
+
+  .zombie.flip { animation-name: shamble-flip; }
+  .zombie:nth-child(2) { animation-delay: -0.4s; height: 122px; width: 73px; }
+  .zombie:nth-child(3) { animation-delay: -0.9s; }
+  .zombie:nth-child(4) { animation-delay: -0.2s; height: 128px; width: 77px; }
+  .zombie:nth-child(5) { animation-delay: -1.2s; }
+  .zombie:nth-child(6) { animation-delay: -0.7s; height: 118px; width: 71px; }
+
+  .z1 { --skin: #9bd96f; --shirt: #c9577c; --pants: #4a3f7a; }
+  .z2 { --skin: #7fc7a0; --shirt: #e0a13a; --pants: #3d4a6b; }
+  .z3 { --skin: #b5d85a; --shirt: #5b8fd6; --pants: #5a3b5e; }
+  .z4 { --skin: #8fd1c0; --shirt: #f0ece0; --pants: #3f5a4a; }
+
+  /* ---------- Implants ---------- */
+
+  .implants {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 56px 16px 24px;
+  }
+
+  .implants h2 {
+    margin: 0;
+    font-family: var(--comic);
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    color: var(--gold);
+    text-shadow: 3px 3px 0 #000;
+  }
+
+  .implants .lede {
+    margin: 8px 0 28px;
+    max-width: 60ch;
+    color: #cfc6ee;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .implant-card {
+    padding: 18px 16px 16px;
+    background: var(--panel);
+    border: 3px solid var(--bone);
+    border-radius: 16px;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .implant-card:nth-child(odd) { transform: rotate(-1deg); }
+  .implant-card:nth-child(even) { transform: rotate(1deg); }
+
+  .implant-card svg {
+    display: block;
+    width: 84px;
+    height: 84px;
+    margin-bottom: 8px;
+  }
+
+  .implant-card h3 {
+    margin: 0;
+    font-family: var(--comic);
+    font-weight: 400;
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+    color: var(--toxic);
+  }
+
+  .implant-card p {
+    margin: 2px 0 12px;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    min-height: 2.7em;
+  }
+
+  .stat {
+    display: grid;
+    grid-template-columns: 6.6em 1fr 2.2em;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .stat + .stat { margin-top: 6px; }
+
+  .bar {
+    height: 12px;
+    background: #140e2b;
+    border: 2px solid #000;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar i {
+    display: block;
+    height: 100%;
+    width: var(--v);
+    background: var(--toxic);
+    border-radius: 99px;
+  }
+
+  .stat.down .bar i { background: var(--blood); }
+  .stat .delta { text-align: right; color: var(--toxic); }
+  .stat.down .delta { color: #ff8f9a; }
+
+  /* ---------- Footer and log button ---------- */
+
+  footer {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 16px 8px;
+    color: #a99fce;
+    font-size: 0.92rem;
+  }
+
+  .log-btn {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 16px 10px 12px;
+    background: var(--bone);
+    color: var(--ink);
+    font-family: var(--comic);
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    box-shadow: 5px 5px 0 #000;
+    transform: rotate(-2deg);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .log-btn::before { /* clipboard clip */
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 46px;
+    height: 16px;
+    transform: translateX(-50%);
+    background: #9aa3b8;
+    border: 3px solid var(--ink);
+    border-radius: 6px 6px 3px 3px;
+  }
+
+  .log-btn:hover,
+  .log-btn:focus-visible {
+    transform: rotate(0deg) translate(-2px, -2px);
+    box-shadow: 8px 8px 0 #000;
+  }
+
+  .log-btn svg { width: 34px; height: 34px; flex: none; }
+
+  /* ---------- Motion ---------- */
+
+  @keyframes wobble {
+    0%, 100% { transform: rotate(-1.2deg); }
+    50% { transform: rotate(0.6deg); }
+  }
+
+  @keyframes shamble {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    50% { transform: rotate(4deg) translateY(-3px); }
+  }
+
+  @keyframes shamble-flip {
+    0%, 100% { transform: scaleX(-1) rotate(-4deg) translateY(0); }
+    50% { transform: scaleX(-1) rotate(4deg) translateY(-3px); }
+  }
+
+  @keyframes moonpulse {
+    0%, 100% { box-shadow: 0 0 0 5px var(--ink), 0 0 60px 12px rgba(168, 240, 78, 0.35); }
+    50% { box-shadow: 0 0 0 5px var(--ink), 0 0 90px 26px rgba(168, 240, 78, 0.55); }
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 7px 7px 0 var(--ink), 0 0 0 3px var(--coral), 0 0 22px 2px rgba(232, 130, 94, 0.45); }
+    50% { box-shadow: 7px 7px 0 var(--ink), 0 0 0 3px var(--coral), 0 0 38px 8px rgba(232, 130, 94, 0.75); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.55); opacity: 0.6; }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    46% { opacity: 1; }
+    48% { opacity: 0.25; }
+    50% { opacity: 1; }
+    52% { opacity: 0.4; }
+    54% { opacity: 1; }
+  }
+
+  .zombie.flip { transform: scaleX(-1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ---------- Smaller screens ---------- */
+
+  @media (max-width: 980px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 820px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    /* buttons first on small screens so they sit above the fixed log button */
+    .surgeon-wrap { width: min(62vw, 250px); grid-row: 3; margin-top: 12px; }
+    .hero-text { display: contents; }
+    .hero-head { grid-row: 1; }
+    .hero-body { grid-row: 2; }
+    .play { max-width: 460px; }
+  }
+
+  @media (max-width: 560px) {
+    .play { grid-template-columns: 1fr; gap: 20px; }
+    .cards { grid-template-columns: 1fr; }
+    .implant-card p { min-height: 0; }
+    .zombie:nth-child(2), .zombie:nth-child(5), .zombie:nth-child(6) { display: none; }
+    .horde { padding: 0 6vw 6px; }
+    .log-btn { font-size: 1.05rem; padding: 14px 12px 8px 10px; }
+    .log-btn svg { width: 28px; height: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared artwork -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="zombie" viewBox="0 0 120 200">
+      <ellipse cx="60" cy="194" rx="40" ry="6" fill="#000" opacity=".4"/>
+      <!-- legs -->
+      <path d="M48 140 L42 184 M72 140 L80 184" stroke="#120c24" stroke-width="24" stroke-linecap="round" fill="none"/>
+      <path d="M48 140 L42 184 M72 140 L80 184" stroke="var(--pants, #4a3f7a)" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <ellipse cx="36" cy="189" rx="15" ry="8" fill="#3a2a22" stroke="#120c24" stroke-width="4"/>
+      <ellipse cx="76" cy="189" rx="15" ry="8" fill="#3a2a22" stroke="#120c24" stroke-width="4"/>
+      <!-- far arm -->
+      <path d="M46 110 L10 116" stroke="#120c24" stroke-width="19" stroke-linecap="round"/>
+      <path d="M46 110 L10 116" stroke="var(--skin, #9bd96f)" stroke-width="11" stroke-linecap="round"/>
+      <!-- torn shirt -->
+      <path d="M34 94 Q34 78 48 78 L72 78 Q86 78 86 94 L86 148 L78 138 L70 150 L60 138 L50 150 L42 138 L34 148 Z" fill="var(--shirt, #c9577c)" stroke="#120c24" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M66 96 l8 8 m0 -8 l-8 8" stroke="#120c24" stroke-width="3" stroke-linecap="round"/>
+      <!-- near arm -->
+      <path d="M42 92 L4 84" stroke="#120c24" stroke-width="19" stroke-linecap="round"/>
+      <path d="M42 92 L4 84" stroke="var(--skin, #9bd96f)" stroke-width="11" stroke-linecap="round"/>
+      <path d="M40 86 L24 83" stroke="var(--shirt, #c9577c)" stroke-width="13" stroke-linecap="round"/>
+      <!-- head -->
+      <ellipse cx="58" cy="44" rx="31" ry="33" fill="var(--skin, #9bd96f)" stroke="#120c24" stroke-width="4"/>
+      <path d="M36 22 l6 -12 l6 10 l8 -14 l6 13 l8 -9 l4 12" fill="#3a2a22" stroke="#120c24" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="46" cy="40" r="11" fill="#fff" stroke="#120c24" stroke-width="3"/>
+      <circle cx="43" cy="41" r="3.5" fill="#120c24"/>
+      <circle cx="70" cy="43" r="7" fill="#ffe86b" stroke="#120c24" stroke-width="3"/>
+      <circle cx="68" cy="43" r="2.2" fill="#120c24"/>
+      <ellipse cx="54" cy="64" rx="13" ry="7" fill="#3b1230" stroke="#120c24" stroke-width="3"/>
+      <rect x="49" y="58" width="6" height="6" rx="1" fill="#fff" stroke="#120c24" stroke-width="1.5"/>
+      <rect x="58" y="65" width="5" height="5" rx="1" fill="#fff" stroke="#120c24" stroke-width="1.5"/>
+      <path d="M72 22 l10 10 m-8 -1 l3 -5 m1 9 l4 -5" stroke="#120c24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+
+  <svg class="skyline" viewBox="0 0 1600 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+    <!-- far buildings -->
+    <path fill="#2c1f55" d="M0 260V150h80v-40h70v60h60v-90h90v50h50v-30h100v70h80v-110h70v80h120v-50h90v-40h60v90h100v-70h80v40h70v-100h90v60h110v-30h80v70h200V260Z"/>
+    <g fill="#3b2a6e">
+      <rect x="225" y="95" width="10" height="14"/><rect x="250" y="95" width="10" height="14"/><rect x="225" y="125" width="10" height="14"/>
+      <rect x="545" y="75" width="10" height="14"/><rect x="570" y="105" width="10" height="14"/>
+      <rect x="1195" y="65" width="10" height="14"/><rect x="1220" y="95" width="10" height="14"/><rect x="1245" y="65" width="10" height="14"/>
+    </g>
+    <!-- near buildings -->
+    <g fill="#1a1236">
+      <rect x="0" y="190" width="120" height="70"/>
+      <rect x="120" y="140" width="90" height="120"/>
+      <rect x="210" y="210" width="140" height="50"/>
+      <rect x="350" y="170" width="60" height="90"/>
+      <rect x="410" y="215" width="210" height="45"/>
+      <rect x="980" y="205" width="160" height="55"/>
+      <rect x="1140" y="150" width="100" height="110"/>
+      <rect x="1240" y="195" width="130" height="65"/>
+      <path d="M1370 260V120l20 14 15-22 20 18 15-12 20 10V260Z"/>
+      <rect x="1460" y="180" width="140" height="80"/>
+      <!-- hospital -->
+      <rect x="620" y="100" width="360" height="160"/>
+      <rect x="730" y="52" width="140" height="50"/>
+    </g>
+    <!-- hospital windows -->
+    <g fill="#2c1f55">
+      <rect x="645" y="120" width="22" height="18"/><rect x="735" y="120" width="22" height="18"/><rect x="780" y="120" width="22" height="18"/><rect x="870" y="120" width="22" height="18"/><rect x="915" y="120" width="22" height="18"/>
+      <rect x="690" y="152" width="22" height="18"/><rect x="735" y="152" width="22" height="18"/><rect x="825" y="152" width="22" height="18"/><rect x="915" y="152" width="22" height="18"/>
+      <rect x="645" y="184" width="22" height="18"/><rect x="690" y="184" width="22" height="18"/><rect x="870" y="184" width="22" height="18"/>
+      <rect x="778" y="212" width="44" height="48"/>
+    </g>
+    <g fill="#ffd23f">
+      <rect class="lit" x="690" y="120" width="22" height="18"/>
+      <rect class="lit" x="825" y="120" width="22" height="18"/>
+      <rect class="lit" x="780" y="152" width="22" height="18"/>
+      <rect class="lit" x="915" y="184" width="22" height="18"/>
+      <rect class="lit" x="145" y="160" width="12" height="16"/>
+      <rect class="lit" x="172" y="190" width="12" height="16"/>
+      <rect class="lit" x="1165" y="170" width="12" height="16"/>
+      <rect class="lit" x="1200" y="205" width="12" height="16"/>
+      <rect class="lit" x="1500" y="198" width="12" height="16"/>
+      <rect class="lit" x="372" y="188" width="12" height="16"/>
+    </g>
+    <g fill="#a8f04e">
+      <rect class="lit" x="645" y="152" width="22" height="18"/>
+      <rect class="lit" x="870" y="152" width="22" height="18"/>
+      <rect class="lit" x="735" y="184" width="22" height="18"/>
+    </g>
+    <!-- crooked hospital sign -->
+    <g transform="rotate(-9 800 76)">
+      <rect x="772" y="58" width="56" height="38" rx="5" fill="#f6f0d8" stroke="#120c24" stroke-width="4"/>
+      <path d="M795 64h10v8h9v10h-9v8h-10v-8h-9v-10h9z" fill="#ff4d5e"/>
+    </g>
+    <path d="M1000 205l12 16-8 12 10 14" stroke="#2c1f55" stroke-width="3" fill="none"/>
+    <rect x="0" y="256" width="1600" height="4" fill="#120c24"/>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-head">
+        <p class="kicker">A biomedical survival game</p>
+        <h1><span class="w1">Surgical</span> <span class="w2">Apocalypse</span></h1>
+        <svg class="drips" viewBox="0 0 520 44" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M4 4h512c4 0 4 8 0 8h-30c-6 0-8 4-8 10s-10 6-10 0-2-10-8-10h-70c-6 0-8 5-8 14 0 10-12 10-12 0 0-9-2-14-8-14h-96c-5 0-7 3-7 8s-9 5-9 0-2-8-7-8h-74c-6 0-8 6-8 18 0 9-13 9-13 0 0-12-2-18-8-18H96c-5 0-7 3-7 9s-10 6-10 0-2-9-7-9H4c-4 0-4-8 0-8z" fill="#a8f04e" stroke="#120c24" stroke-width="3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="hero-body">
+        <p class="tagline">The dead are rising. Your limbs are falling off. Good thing you're a surgeon.</p>
+        <p class="subline">Patch yourself up with implants, live with what they do to your stats, and try to outlast the horde.</p>
+
+        <nav class="play" aria-label="Choose a version of the game">
+          <a class="play-btn hand" id="play-hand-built" href="hand-built/index.html">
+            <svg viewBox="0 0 60 60" aria-hidden="true" focusable="false">
+              <!-- needle and thread -->
+              <path d="M8 46c8 8 14-8 22-2s10 8 20 2" fill="none" stroke="#ff4d5e" stroke-width="4" stroke-linecap="round"/>
+              <path d="M50 8L16 40" stroke="#120c24" stroke-width="9" stroke-linecap="round"/>
+              <path d="M50 8L16 40" stroke="#c9ccd6" stroke-width="4.5" stroke-linecap="round"/>
+              <ellipse cx="46" cy="12" rx="2.2" ry="3.6" transform="rotate(46 46 12)" fill="#120c24"/>
+              <path d="M18 22l8 8M12 28l8 8" stroke="#120c24" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <span>
+              <span class="label">Version 1</span>
+              <span class="name">Hand-Built Game</span>
+              <span class="desc">Hand-coded, stitches and all.</span>
+            </span>
+          </a>
+
+          <a class="play-btn claude" id="play-claude" href="claude-enhanced/index.html">
+            <svg viewBox="0 0 60 60" aria-hidden="true" focusable="false">
+              <!-- spark -->
+              <path d="M30 4l5 17 17-5-12 14 12 14-17-5-5 17-5-17-17 5 12-14L8 16l17 5z" fill="#ffd23f" stroke="#120c24" stroke-width="3.5" stroke-linejoin="round"/>
+              <circle cx="30" cy="30" r="6" fill="#fff6ea" stroke="#120c24" stroke-width="3"/>
+            </svg>
+            <span>
+              <span class="label">Version 2</span>
+              <span class="name">Claude Code Enhanced</span>
+              <span class="desc">The same game, upgraded with AI.</span>
+            </span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="surgeon-wrap">
+      <div class="moon" aria-hidden="true"></div>
+      <svg class="surgeon" viewBox="0 0 340 440" role="img" aria-label="Cartoon surgeon in teal scrubs and a mask, raising a scalpel with a bionic arm and holding a syringe of green serum">
+        <ellipse cx="160" cy="426" rx="96" ry="12" fill="#000" opacity=".45"/>
+
+        <!-- legs -->
+        <rect x="116" y="296" width="40" height="108" rx="12" fill="#1f8f85" stroke="#120c24" stroke-width="5"/>
+        <rect x="164" y="296" width="40" height="108" rx="12" fill="#1f8f85" stroke="#120c24" stroke-width="5"/>
+        <rect x="102" y="392" width="58" height="28" rx="14" fill="#f6f0d8" stroke="#120c24" stroke-width="5"/>
+        <rect x="160" y="392" width="58" height="28" rx="14" fill="#f6f0d8" stroke="#120c24" stroke-width="5"/>
+
+        <!-- human arm with syringe -->
+        <path d="M106 198L64 244 68 294" fill="none" stroke="#120c24" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M106 198L64 244 68 294" fill="none" stroke="#f2b98a" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M106 198L82 226" fill="none" stroke="#2fb7a8" stroke-width="27" stroke-linecap="round"/>
+        <g transform="translate(-22 -2) rotate(-28 90 300)">
+          <rect x="82" y="236" width="16" height="52" rx="3" fill="#eef4ff" stroke="#120c24" stroke-width="4"/>
+          <rect x="84.500" y="258" width="11" height="28" fill="#a8f04e"/>
+          <path d="M90 236v-18M80 218h20" stroke="#120c24" stroke-width="5" stroke-linecap="round"/>
+          <path d="M90 288v0" stroke="#120c24" stroke-width="4"/>
+          <rect x="78" y="286" width="24" height="7" rx="2" fill="#9aa3b8" stroke="#120c24" stroke-width="3.5"/>
+        </g>
+        <circle cx="68" cy="298" r="16" fill="#f2b98a" stroke="#120c24" stroke-width="5"/>
+
+        <!-- torso -->
+        <path d="M98 192q0-22 26-24h72q26 2 26 24l6 118q-68 18-136 0z" fill="#2fb7a8" stroke="#120c24" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M138 168l22 34 22-34z" fill="#f6f0d8" stroke="#120c24" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="176" y="232" width="32" height="30" rx="4" fill="#26a092" stroke="#120c24" stroke-width="4"/>
+        <path d="M186 232v-10" stroke="#ff4d5e" stroke-width="5" stroke-linecap="round"/>
+        <!-- zombie goo -->
+        <path d="M112 262c-6-12 8-22 16-14 10-6 20 6 12 16 6 10-8 18-14 10-8 6-20-2-14-12z" fill="#a8f04e" stroke="#120c24" stroke-width="3.5" stroke-linejoin="round"/>
+        <circle cx="146" cy="288" r="5" fill="#a8f04e" stroke="#120c24" stroke-width="3"/>
+
+        <!-- stethoscope -->
+        <path d="M134 172q-6 62 26 66 32-4 26-66" fill="none" stroke="#120c24" stroke-width="9" stroke-linecap="round"/>
+        <path d="M134 172q-6 62 26 66 32-4 26-66" fill="none" stroke="#5b5380" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="160" cy="246" r="11" fill="#c9ccd6" stroke="#120c24" stroke-width="4"/>
+        <circle cx="160" cy="246" r="4" fill="#5b5380"/>
+
+        <!-- neck and head -->
+        <rect x="146" y="150" width="28" height="26" fill="#e0a273" stroke="#120c24" stroke-width="5"/>
+        <circle cx="100" cy="116" r="11" fill="#f2b98a" stroke="#120c24" stroke-width="5"/>
+        <circle cx="220" cy="116" r="11" fill="#f2b98a" stroke="#120c24" stroke-width="5"/>
+        <circle cx="160" cy="110" r="60" fill="#f2b98a" stroke="#120c24" stroke-width="5"/>
+        <!-- mask -->
+        <path d="M100 118L112 132M220 118L208 132" stroke="#f6f0d8" stroke-width="4" stroke-linecap="round"/>
+        <path d="M108 128q52-12 104 0l-6 34q-46 24-92 0z" fill="#dff3ff" stroke="#120c24" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M118 142q42-8 84 0M120 154q40-6 80 0" fill="none" stroke="#9cc4dd" stroke-width="3" stroke-linecap="round"/>
+        <!-- eyes -->
+        <ellipse cx="137" cy="104" rx="14" ry="15" fill="#fff" stroke="#120c24" stroke-width="4"/>
+        <ellipse cx="183" cy="104" rx="14" ry="15" fill="#fff" stroke="#120c24" stroke-width="4"/>
+        <circle cx="141" cy="106" r="6.500" fill="#120c24"/>
+        <circle cx="187" cy="106" r="6.500" fill="#120c24"/>
+        <circle cx="143" cy="103" r="2" fill="#fff"/>
+        <circle cx="189" cy="103" r="2" fill="#fff"/>
+        <!-- cap -->
+        <path d="M101 96q2-58 59-58t59 58q-59-20-118 0z" fill="#2fb7a8" stroke="#120c24" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M108 80q52-16 104 0" fill="none" stroke="#1f8f85" stroke-width="5" stroke-linecap="round"/>
+        <path d="M152 54h16M160 46v16" stroke="#f6f0d8" stroke-width="6" stroke-linecap="round"/>
+        <path d="M119 84l32 9M201 84l-32 9" stroke="#120c24" stroke-width="7" stroke-linecap="round"/>
+
+        <!-- scalpel (behind the claw) -->
+        <path d="M262 108L304 52" stroke="#120c24" stroke-width="13" stroke-linecap="round"/>
+        <path d="M262 108L304 52" stroke="#9aa3b8" stroke-width="7" stroke-linecap="round"/>
+        <path d="M298 58L326 18q6 26-14 50z" fill="#eef4ff" stroke="#120c24" stroke-width="4" stroke-linejoin="round"/>
+        <path class="sparkle" d="M322 6l3 11 11 3-11 3-3 11-3-11-11-3 11-3z" fill="#fff" stroke="#120c24" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- bionic arm -->
+        <path d="M214 198L262 176 272 106" fill="none" stroke="#120c24" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M214 198L262 176 272 106" fill="none" stroke="#aab2c5" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M228 180l8 20M240 175l8 20M254 150l24 4M256 136l24 4" stroke="#120c24" stroke-width="3.500" stroke-linecap="round"/>
+        <circle cx="214" cy="198" r="17" fill="#6c7691" stroke="#120c24" stroke-width="5"/>
+        <path d="M207 198h14M214 191v14" stroke="#120c24" stroke-width="3.500" stroke-linecap="round"/>
+        <circle cx="262" cy="176" r="16" fill="#6c7691" stroke="#120c24" stroke-width="5"/>
+        <circle cx="262" cy="176" r="6.500" fill="#a8f04e" stroke="#120c24" stroke-width="3"/>
+        <!-- claw hand -->
+        <circle cx="272" cy="102" r="17" fill="#6c7691" stroke="#120c24" stroke-width="5"/>
+        <rect x="252" y="84" width="14" height="24" rx="6" transform="rotate(-38 259 96)" fill="#aab2c5" stroke="#120c24" stroke-width="4"/>
+        <rect x="266" y="78" width="14" height="24" rx="6" transform="rotate(-8 273 90)" fill="#aab2c5" stroke="#120c24" stroke-width="4"/>
+        <rect x="280" y="86" width="14" height="24" rx="6" transform="rotate(30 287 98)" fill="#aab2c5" stroke="#120c24" stroke-width="4"/>
+        <circle cx="272" cy="104" r="4" fill="#a8f04e" stroke="#120c24" stroke-width="2.500"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<div class="horde" aria-hidden="true">
+  <svg class="zombie z1 flip"><use href="#zombie"/></svg>
+  <svg class="zombie z2 flip"><use href="#zombie"/></svg>
+  <svg class="zombie z3 flip"><use href="#zombie"/></svg>
+  <svg class="zombie z4"><use href="#zombie"/></svg>
+  <svg class="zombie z1"><use href="#zombie"/></svg>
+  <svg class="zombie z3"><use href="#zombie"/></svg>
+</div>
+
+<main>
+  <section class="implants" aria-labelledby="implants-title">
+    <h2 id="implants-title">Every upgrade has a price</h2>
+    <p class="lede">When a zombie takes a piece of you, you pick the replacement. Each implant is real biomedical engineering, and each one changes how you survive.</p>
+
+    <ul class="cards">
+      <li class="implant-card">
+        <svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
+          <circle cx="42" cy="42" r="39" fill="#3b2a6e" stroke="#120c24" stroke-width="3"/>
+          <path d="M22 62L40 44 58 28" fill="none" stroke="#120c24" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 62L40 44 58 28" fill="none" stroke="#aab2c5" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="44" r="7" fill="#6c7691" stroke="#120c24" stroke-width="3"/>
+          <circle cx="40" cy="44" r="2.500" fill="#a8f04e"/>
+          <path d="M56 20q8-6 12 2M64 32q8 2 6-8" fill="none" stroke="#120c24" stroke-width="8" stroke-linecap="round"/>
+          <path d="M56 20q8-6 12 2M64 32q8 2 6-8" fill="none" stroke="#aab2c5" stroke-width="3.500" stroke-linecap="round"/>
+        </svg>
+        <h3>Bionic Arm</h3>
+        <p>Crushes skulls. Weighs a ton.</p>
+        <div class="stat"><span>Attack</span><span class="bar"><i style="--v:92%"></i></span><span class="delta">&#9650;</span></div>
+        <div class="stat down"><span>Mobility</span><span class="bar"><i style="--v:34%"></i></span><span class="delta">&#9660;</span></div>
+      </li>
+
+      <li class="implant-card">
+        <svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
+          <circle cx="42" cy="42" r="39" fill="#3b2a6e" stroke="#120c24" stroke-width="3"/>
+          <rect x="30" y="10" width="22" height="24" rx="6" fill="#6c7691" stroke="#120c24" stroke-width="3.500"/>
+          <path d="M41 34v14" stroke="#120c24" stroke-width="10" stroke-linecap="round"/>
+          <path d="M41 34v14" stroke="#c9ccd6" stroke-width="4.500" stroke-linecap="round"/>
+          <path d="M41 46q-4 24 12 26h12" fill="none" stroke="#120c24" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M41 46q-4 24 12 26h12" fill="none" stroke="#aab2c5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 58h10M10 66h12" stroke="#a8f04e" stroke-width="3.500" stroke-linecap="round"/>
+        </svg>
+        <h3>Titanium Leg</h3>
+        <p>Outruns the horde. The stump needs watching.</p>
+        <div class="stat"><span>Mobility</span><span class="bar"><i style="--v:90%"></i></span><span class="delta">&#9650;</span></div>
+        <div class="stat down"><span>Infection</span><span class="bar"><i style="--v:62%"></i></span><span class="delta">&#9650;</span></div>
+      </li>
+
+      <li class="implant-card">
+        <svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
+          <circle cx="42" cy="42" r="39" fill="#3b2a6e" stroke="#120c24" stroke-width="3"/>
+          <path d="M58 30q14-14 8-22" fill="none" stroke="#120c24" stroke-width="7" stroke-linecap="round"/>
+          <path d="M58 30q14-14 8-22" fill="none" stroke="#ff4d5e" stroke-width="3" stroke-linecap="round"/>
+          <rect x="14" y="26" width="52" height="40" rx="14" fill="#c9ccd6" stroke="#120c24" stroke-width="3.500"/>
+          <path d="M40 58c-14-9-13-20-6-21 4 0 6 4 6 4s2-4 6-4c7 1 8 12-6 21z" fill="#ff4d5e" stroke="#120c24" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M18 46h10l4-8 5 14 5-12 3 6h17" fill="none" stroke="#120c24" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Pacemaker</h3>
+        <p>Steady pulse, slower bleeding. Go easy on the brawling.</p>
+        <div class="stat"><span>Bleeding</span><span class="bar"><i style="--v:84%"></i></span><span class="delta">&#9660;</span></div>
+        <div class="stat down"><span>Attack</span><span class="bar"><i style="--v:30%"></i></span><span class="delta">&#9660;</span></div>
+      </li>
+
+      <li class="implant-card">
+        <svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
+          <circle cx="42" cy="42" r="39" fill="#3b2a6e" stroke="#120c24" stroke-width="3"/>
+          <path d="M8 42q34-34 68 0-34 34-68 0z" fill="#fff" stroke="#120c24" stroke-width="3.500" stroke-linejoin="round"/>
+          <circle cx="42" cy="42" r="15" fill="#6c7691" stroke="#120c24" stroke-width="3.500"/>
+          <circle cx="42" cy="42" r="9" fill="#a8f04e" stroke="#120c24" stroke-width="3"/>
+          <circle cx="42" cy="42" r="3.500" fill="#120c24"/>
+          <path d="M42 22v8M42 54v8M22 42h8M54 42h8" stroke="#120c24" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <h3>Ocular Implant</h3>
+        <p>Reads your own vital signs at a glance.</p>
+        <div class="stat"><span>Biometrics</span><span class="bar"><i style="--v:100%"></i></span><span class="delta">ON</span></div>
+        <div class="stat down"><span>Infection</span><span class="bar"><i style="--v:55%"></i></span><span class="delta">&#9650;</span></div>
+      </li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <p>DH 200 Final Project. One game, built twice: once by hand and once with Claude Code.</p>
+</footer>
+
+<a class="log-btn" id="ai-log-link" href="ai-log/AI-Use-Log.html">
+  <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+    <rect x="3" y="3" width="30" height="30" rx="5" fill="#fff" stroke="#120c24" stroke-width="3"/>
+    <path d="M6 20h6l3-8 5 14 4-10 2 4h5" fill="none" stroke="#ff4d5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  AI Usage Log
+</a>
+
+</body>
+</html>

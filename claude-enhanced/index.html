@@ -222,6 +222,9 @@
   .horde-bar i { height: 8px; border-radius: 3px; background: #2f2558; border: 1.5px solid #000; }
   .horde-bar i.on { background: var(--blood); }
   .top-actions { display: flex; gap: 8px; }
+  .mini-hud { display: none; flex-direction: column; align-items: flex-end; font-size: .72rem; font-weight: 800; line-height: 1.2; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .mini-hud b { font-family: var(--comic); font-weight: 400; font-size: 1rem; letter-spacing: .04em; }
+  .floor-name .short { display: none; }
 
   .game { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; padding-top: 20px; padding-bottom: 40px; align-items: start; }
 
@@ -320,7 +323,21 @@
   .stat .bar { height: 11px; background: #140e2b; border: 2px solid #000; border-radius: 99px; overflow: hidden; }
   .stat .bar i { display: block; height: 100%; width: var(--v); background: var(--c, var(--toxic)); border-radius: 99px; transition: width .5s ease; }
   .stat .val { text-align: right; }
-  .vague .stat .bar i, .vague .hpbar i { filter: blur(2px); opacity: .8; }
+  /* Without a bionic eye or arm the monitor shows nothing that leaks your real numbers. */
+  .no-signal, .static { display: none; }
+  .offline .hp-readout, .offline .ecg, .offline .hpbar, .offline .stats { display: none; }
+  .offline .monitor { grid-template-columns: 1fr; min-height: 78px; place-items: center; overflow: hidden; }
+  .offline .no-signal {
+    display: block; position: relative; z-index: 1;
+    font-family: var(--comic); font-size: 1.6rem; letter-spacing: .12em; text-transform: uppercase;
+    color: #6f6599;
+  }
+  .offline .static {
+    display: block; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, transparent 2px 4px);
+    animation: staticroll 1.2s steps(6) infinite;
+  }
+  @keyframes staticroll { from { background-position: 0 0; } to { background-position: 0 24px; } }
 
   .body-wrap { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; }
   .body-svg { width: 96px; height: auto; display: block; }
@@ -361,7 +378,8 @@
     background: var(--gold); color: var(--ink); border: 2px solid #000; border-radius: 99px;
   }
   .item:hover:not(:disabled) { background: var(--line); }
-  .item:disabled { cursor: default; opacity: .45; }
+  .item:disabled { cursor: default; opacity: .75; }
+  .item.empty:disabled { opacity: .4; }
   .item.empty .count { background: #3b2a6e; color: var(--faint); }
 
   .journal ol { margin: 0; padding: 0; list-style: none; font-size: .82rem; line-height: 1.3; max-height: 220px; overflow-y: auto; }
@@ -374,6 +392,7 @@
 
   #screen-end { padding: 22px 0 60px; }
   .end-card { overflow: hidden; }
+  .end-card .scene { aspect-ratio: auto; height: clamp(170px, 28vw, 300px); }
   .end-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 22px; }
   .end-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(2.4rem, 8vw, 4.4rem); line-height: .95; text-shadow: 3px 3px 0 var(--ink), -3px 3px 0 var(--ink), 3px -3px 0 var(--ink), -3px -3px 0 var(--ink), 6px 7px 0 rgba(0,0,0,.5); }
   .end-head h2.win { color: var(--toxic); }
@@ -463,7 +482,7 @@
   @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
   @keyframes rise { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
   @keyframes ecg { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
   @keyframes steam { 0%,100%{transform:translateY(0); opacity:.6} 50%{transform:translateY(-6px); opacity:.2} }
 
   @media (prefers-reduced-motion: reduce) {
@@ -484,6 +503,11 @@
     .rank .r-blurb { min-height: 0; }
     .sidebar { grid-template-columns: 1fr; }
     .brand { display: none; }
+    .mini-hud { display: flex; }
+    .floor-name .long { display: none; }
+    .floor-name .short { display: inline; }
+    .top-actions .icon-btn[data-open] { display: none; }
+    .topbar .wrap { gap: 10px; }
     .end-body { grid-template-columns: 1fr; }
     .end-head { grid-template-columns: 1fr; }
     .grade { width: 90px; height: 90px; font-size: 3.2rem; }
@@ -582,8 +606,8 @@
             <li><b>Five body parts and 11 implants</b> (the ear is new), each with a real biomedical engineering fact in the codex.</li>
             <li><b>Fair, seeded randomness:</b> a fixed mix of encounters on every floor instead of coin flips, so no run is a fluke.</li>
             <li><b>Three ranks</b> tuned by simulating thousands of games.</li>
-            <li><b>Items, karma and a growing horde:</b> bandages, antibiotics and adrenaline; good deeds open service stairs, and fleeing comes back to bite you.</li>
-            <li><b>Biometrics actually do something:</b> exact vitals and fight odds once you install a bionic eye or arm.</li>
+            <li><b>Items, a hidden conscience and a growing horde:</b> bandages, antibiotics and adrenaline; good deeds are quietly remembered, and fleeing comes back to bite you.</li>
+            <li><b>Biometrics actually matter:</b> your vitals stay hidden until you install a bionic eye or arm.</li>
             <li>Hand-drawn art, autosave, high scores, keyboard play and sound.</li>
           </ul>
         </div>
@@ -609,6 +633,7 @@
           <div class="pips" id="pips" aria-hidden="true"></div>
         </div>
       </div>
+      <div class="mini-hud" id="mini-hud" aria-hidden="true"></div>
       <div class="horde" id="horde" title="The horde grows every turn, and faster when you leave zombies alive.">
         <span class="horde-label">Horde: <b id="horde-word">Restless</b></span>
         <span class="horde-bar"><i></i><i></i><i></i><i></i></span>
@@ -638,10 +663,12 @@
       <section class="panel" id="vitals-panel">
         <h3>Vitals</h3>
         <div class="monitor">
-          <div class="hp-readout"><span class="hp-num" id="hp-num">100</span><span class="hp-label">HP</span></div>
+          <div class="hp-readout"><span class="hp-num" id="hp-num"></span><span class="hp-label">HP</span></div>
+          <div class="no-signal" aria-hidden="true">No signal</div>
           <div class="ecg" aria-hidden="true">
             <svg viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 34h40l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
           </div>
+          <div class="static" aria-hidden="true"></div>
         </div>
         <div class="hpbar"><i id="hp-bar"></i></div>
         <p class="biom" id="biom"></p>
@@ -714,13 +741,14 @@
     <h3>Your vitals</h3>
     <ul>
       <li><b>HP</b>: hit 0 and you join the horde.</li>
-      <li><b>Bleeding</b> costs that much HP every turn. Bandages and implants stop it.</li>
-      <li><b>Infection</b> is the chance each turn that a fever hits you for 6 HP. Bites raise it. Antibiotics lower it.</li>
+      <li><b>Bleeding</b> drains HP every turn. Bandages and implants slow it.</li>
+      <li><b>Infection</b> is the chance each turn that a fever knocks you down. Bites raise it. Antibiotics lower it.</li>
       <li><b>Attack</b> lowers the damage you take in a fight. <b>Mobility</b> raises your odds of escaping.</li>
-      <li><b>Karma</b>: at 70 or more, survivors show you service stairs that skip part of a floor. At 30 or less, the dead follow the screams of the people you left behind.</li>
     </ul>
     <h3>Biometrics</h3>
-    <p>Without implants you only get a rough feel for your condition ("Shaky", "Feverish"). Install a <b>bionic eye</b> or <b>bionic arm</b> to get exact numbers and the projected odds of every fight.</p>
+    <p>You cannot see your own vitals. Until you install a <b>bionic eye</b> or <b>bionic arm</b>, the monitor shows no signal and you have to go by feel. With biometrics online you get exact vitals, exact readings of every change, and a scanner read on each fight.</p>
+    <h3>Your conscience</h3>
+    <p>The hospital remembers how you treat people. Help others and survivors may return the favor. Abandon them and the dead may follow their screams to you.</p>
     <h3>The horde</h3>
     <p>Every turn the hospital fills up a little more and groups of zombies get bigger. Running away is often safe, but the zombies you leave alive keep hunting you and grow the horde. Fighting costs HP now; fleeing can cost more later.</p>
     <h3>Taking time</h3>
