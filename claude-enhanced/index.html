@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surgical Apocalypse: Enhanced</title>
+<meta name="description" content="Surgical Apocalypse, the Claude Code enhanced version: escape a zombie-infested hospital, choosing implants to replace the parts of you that get torn off.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23120c24'/%3E%3Cpath d='M32 6l6 19 19-6-13 15 13 15-19-6-6 19-6-19-19 6 13-15L7 19l19 6z' fill='%23ffd23f' stroke='%23120c24' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Creepster&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #120c24;
+    --ground: #120c24;
+    --panel: #2a1f52;
+    --panel-2: #221944;
+    --line: #3b2a6e;
+    --bone: #f6f0d8;
+    --muted: #cfc6ee;
+    --faint: #a99fce;
+    --toxic: #a8f04e;
+    --blood: #ff4d5e;
+    --blood-soft: #ff8f9a;
+    --gold: #ffd23f;
+    --scrubs: #2fb7a8;
+    --coral: #e8825e;
+    --steel: #aab2c5;
+    --display: "Creepster", Impact, "Arial Black", fantasy;
+    --comic: "Bangers", Impact, "Arial Black", sans-serif;
+    --body: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html, body { margin: 0; }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 500px at 50% -120px, #3a2266 0%, transparent 70%),
+      var(--ground);
+    color: var(--bone);
+    font-family: var(--body);
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 4px solid var(--gold); outline-offset: 3px; border-radius: 8px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- shared bits ---------- */
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px;
+    background: var(--bone); color: var(--ink);
+    font-family: var(--comic); font-size: 1.2rem; letter-spacing: 0.06em; text-decoration: none;
+    border: 3px solid var(--ink); border-radius: 12px;
+    box-shadow: 4px 4px 0 #000;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000; }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #000; }
+  .btn.primary {
+    background: linear-gradient(135deg, #3a1d4f 0%, #5a2748 55%, #b5553c 130%);
+    color: #fff6ea;
+    box-shadow: 4px 4px 0 #000, 0 0 0 3px var(--coral), 0 0 24px 2px rgba(232,130,94,.45);
+  }
+  .btn.primary:hover { box-shadow: 6px 6px 0 #000, 0 0 0 3px var(--gold), 0 0 32px 6px rgba(255,210,63,.5); }
+  .btn.ghost { background: var(--panel); color: var(--bone); border-color: #000; }
+  .btn.small { padding: 6px 12px; font-size: 1rem; }
+  .btn svg { width: 22px; height: 22px; }
+
+  .icon-btn {
+    display: inline-grid; place-items: center;
+    width: 42px; height: 42px;
+    background: var(--panel); border: 3px solid #000; border-radius: 10px;
+    box-shadow: 3px 3px 0 #000; cursor: pointer;
+  }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .icon-btn:hover { background: var(--line); }
+
+  .panel {
+    background: var(--panel);
+    border: 3px solid #000;
+    border-radius: 16px;
+    box-shadow: 5px 5px 0 #000;
+  }
+  .panel h3 {
+    margin: 0 0 8px;
+    font-family: var(--comic); font-weight: 400; font-size: 1.3rem; letter-spacing: .06em;
+    color: var(--gold);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--comic); font-size: 1.05rem; letter-spacing: .06em;
+    text-decoration: none; color: var(--muted);
+  }
+  .back-link:hover { color: var(--gold); }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 10px;
+    font-size: .82rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+    border: 2px solid #000; border-radius: 99px;
+    background: #1b1338;
+  }
+  .chip.good { background: #1f3d17; color: var(--toxic); }
+  .chip.bad { background: #3d1220; color: var(--blood-soft); }
+
+  /* ---------- title screen ---------- */
+
+  #screen-title { padding: 18px 0 48px; }
+  .title-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .title-hero {
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; align-items: center;
+    margin-top: 18px;
+  }
+  .kicker {
+    display: inline-block; margin: 0 0 8px; padding: 4px 12px;
+    background: linear-gradient(135deg, #5a2748, #b5553c); color: #fff6ea;
+    font-family: var(--comic); font-size: 1.05rem; letter-spacing: .08em;
+    border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink), 0 0 18px rgba(232,130,94,.5);
+    transform: rotate(-2deg);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(2.8rem, 10vw, 5.6rem); line-height: .92; letter-spacing: .02em; text-transform: uppercase;
+    text-shadow:
+      3px 3px 0 var(--ink), -3px 3px 0 var(--ink), 3px -3px 0 var(--ink), -3px -3px 0 var(--ink),
+      7px 8px 0 rgba(0,0,0,.55);
+  }
+  h1 .w1 { color: var(--toxic); display: block; }
+  h1 .w2 { color: var(--blood); display: block; }
+  .tagline { margin: 12px 0 0; max-width: 40ch; font-size: clamp(1.05rem, 2.2vw, 1.25rem); font-weight: 800; }
+  .title-art { position: relative; }
+  .title-art .scene-svg { border: 4px solid #000; border-radius: 18px; box-shadow: 8px 8px 0 #000; }
+
+  .setup { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; margin-top: 30px; }
+  .setup .panel { padding: 18px; }
+  .ranks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; border: 0; }
+  .ranks legend { padding: 0; margin-bottom: 8px; font-family: var(--comic); font-size: 1.3rem; letter-spacing: .06em; color: var(--gold); }
+  .rank { position: relative; }
+  .rank input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .rank label {
+    display: block; height: 100%;
+    padding: 12px;
+    background: var(--panel-2); border: 3px solid #000; border-radius: 12px;
+    cursor: pointer; transition: transform .12s ease, background .12s ease;
+  }
+  .rank label:hover { transform: translateY(-2px); }
+  .rank input:checked + label { background: #3b2a6e; box-shadow: 0 0 0 3px var(--toxic), 4px 4px 0 #000; }
+  .rank input:focus-visible + label { outline: 4px solid var(--gold); outline-offset: 3px; }
+  .rank .r-name { display: block; font-family: var(--comic); font-size: 1.45rem; letter-spacing: .05em; color: var(--toxic); }
+  .rank .r-blurb { display: block; font-size: .86rem; line-height: 1.35; color: var(--muted); min-height: 3.6em; }
+  .rank .r-facts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .rank .r-facts span { font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 99px; background: #140e2b; border: 2px solid #000; }
+
+  .seed-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .seed-row label { font-family: var(--comic); font-size: 1.15rem; letter-spacing: .05em; }
+  .seed-row input {
+    flex: 1 1 180px; min-width: 0;
+    padding: 9px 12px;
+    background: #140e2b; color: var(--bone);
+    font: 800 1rem var(--body); letter-spacing: .06em; text-transform: uppercase;
+    border: 3px solid #000; border-radius: 10px;
+  }
+  .seed-row input::placeholder { color: #6f6599; text-transform: none; letter-spacing: 0; }
+  .start-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  .start-row .btn.primary { font-size: 1.5rem; padding: 12px 26px; }
+  .muted { color: var(--muted); }
+  .small-print { font-size: .86rem; color: var(--faint); margin: 10px 0 0; }
+
+  .side-stack { display: grid; gap: 18px; align-content: start; }
+  .whatsnew ul { margin: 0; padding-left: 18px; font-size: .92rem; line-height: 1.45; }
+  .whatsnew li + li { margin-top: 4px; }
+  .whatsnew b { color: var(--toxic); font-weight: 800; }
+  .best-list { margin: 0; padding: 0; list-style: none; font-size: .9rem; }
+  .best-list li { display: grid; grid-template-columns: 2em 1fr auto; gap: 8px; align-items: center; padding: 5px 0; border-top: 2px dashed var(--line); }
+  .best-list li:first-child { border-top: 0; }
+  .grade-sm { font-family: var(--comic); font-size: 1.3rem; text-align: center; }
+  .title-links { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* ---------- game screen ---------- */
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(18, 12, 36, .94);
+    backdrop-filter: blur(6px);
+    border-bottom: 3px solid #000;
+  }
+  .topbar .wrap { display: flex; align-items: center; gap: 14px; padding-top: 8px; padding-bottom: 8px; }
+  .brand { font-family: var(--display); font-size: 1.5rem; line-height: 1; white-space: nowrap; }
+  .brand .w1 { color: var(--toxic); } .brand .w2 { color: var(--blood); }
+  .tracker { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; }
+  .floors { display: flex; gap: 4px; align-items: flex-end; }
+  .floor-cell {
+    display: grid; place-items: center;
+    width: 30px; height: 30px;
+    font-family: var(--comic); font-size: 1rem;
+    background: #1b1338; border: 2px solid #000; border-radius: 7px; color: var(--faint);
+  }
+  .floor-cell.done { background: #1f3d17; color: var(--toxic); }
+  .floor-cell.now { background: var(--gold); color: var(--ink); transform: translateY(-3px); box-shadow: 0 3px 0 #000; }
+  .floor-meta { min-width: 0; }
+  .floor-name { font-family: var(--comic); font-size: 1.1rem; letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pips { display: flex; gap: 4px; margin-top: 2px; }
+  .pip { width: 14px; height: 8px; border-radius: 4px; background: #2f2558; border: 1.5px solid #000; }
+  .pip.done { background: var(--toxic); }
+  .pip.stairs { width: 18px; background: #5a3b5e; }
+  .horde { display: grid; gap: 2px; min-width: 120px; }
+  .horde-label { font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .horde-label b { color: var(--blood-soft); }
+  .horde-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+  .horde-bar i { height: 8px; border-radius: 3px; background: #2f2558; border: 1.5px solid #000; }
+  .horde-bar i.on { background: var(--blood); }
+  .top-actions { display: flex; gap: 8px; }
+
+  .game { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; padding-top: 20px; padding-bottom: 40px; align-items: start; }
+
+  .story-card { overflow: hidden; }
+  .scene { position: relative; aspect-ratio: 2 / 1; background: #1a1236; border-bottom: 3px solid #000; overflow: hidden; }
+  .scene .scene-svg { display: block; width: 100%; height: 100%; }
+  .scene .flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+  .scene .flash.hurt { background: radial-gradient(ellipse at center, transparent 30%, rgba(255,77,94,.75) 100%); animation: flash .6s ease-out; }
+  .scene .flash.heal { background: radial-gradient(ellipse at center, transparent 30%, rgba(168,240,78,.55) 100%); animation: flash .7s ease-out; }
+  .scene-tag {
+    position: absolute; left: 14px; top: 12px;
+    padding: 2px 10px;
+    font-family: var(--comic); font-size: 1rem; letter-spacing: .06em;
+    background: var(--bone); color: var(--ink);
+    border: 3px solid var(--ink); border-radius: 8px; box-shadow: 3px 3px 0 #000;
+    transform: rotate(-2deg);
+  }
+
+  .story { padding: 18px 22px 22px; }
+  .story h2 {
+    margin: 0 0 10px;
+    font-family: var(--comic); font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.4rem); letter-spacing: .04em; line-height: 1.05;
+    color: var(--gold); text-shadow: 3px 3px 0 #000;
+  }
+  .story h2:focus { outline: none; }
+  .outcome {
+    margin: 0 0 14px; padding: 12px 14px;
+    background: #1b1338; border: 3px solid #000; border-left-width: 8px; border-radius: 12px;
+  }
+  .outcome.bad { border-left-color: var(--blood); }
+  .outcome.good { border-left-color: var(--toxic); }
+  .outcome p { margin: 0; }
+  .outcome p + p { margin-top: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .narrative p { margin: 0 0 10px; font-size: 1.06rem; }
+  .fade-in { animation: rise .35s ease-out both; }
+
+  .choices { display: grid; gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
+  .choice {
+    display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 12px;
+    width: 100%; padding: 12px 14px;
+    text-align: left;
+    background: var(--bone); color: var(--ink);
+    border: 3px solid var(--ink); border-radius: 14px;
+    box-shadow: 5px 5px 0 #000;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .choice:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #000; background: #fffbe9; }
+  .choice:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 2px 2px 0 #000; }
+  .choice:disabled { opacity: .55; cursor: not-allowed; filter: grayscale(.6); }
+  .choice .key {
+    display: grid; place-items: center;
+    width: 34px; height: 34px;
+    font-family: var(--comic); font-size: 1.25rem;
+    background: var(--ink); color: var(--gold); border-radius: 9px;
+  }
+  .choice .c-icon { width: 46px; height: 46px; display: grid; place-items: center; background: #e9e2c8; border: 2px solid var(--ink); border-radius: 10px; }
+  .choice .c-icon .icon { width: 40px; height: 40px; }
+  .choice .c-icon:empty { display: none; }
+  .choice .c-label { display: block; font-family: var(--comic); font-size: 1.35rem; letter-spacing: .04em; line-height: 1.1; }
+  .choice .c-sub { font-family: var(--body); font-size: .8rem; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: #6b5a8a; margin-left: 6px; }
+  .choice .c-hint { display: block; margin-top: 2px; font-size: .9rem; line-height: 1.3; color: #4a3f6a; }
+  .choice.good { background: #e7f8cf; }
+  .choice.bad { background: #fbe1dc; }
+  .choice.next { background: linear-gradient(135deg, #3a1d4f 0%, #5a2748 55%, #b5553c 130%); color: #fff6ea; }
+  .choice.next .c-hint { color: #f3d9c9; }
+
+  /* sidebar */
+  .sidebar { display: grid; gap: 18px; position: sticky; top: 84px; }
+  .sidebar .panel { padding: 14px; }
+  .monitor {
+    position: relative;
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    background: #07140a; border: 3px solid #000; border-radius: 12px;
+    box-shadow: inset 0 0 22px rgba(168,240,78,.15);
+  }
+  .hp-readout { line-height: 1; color: var(--hp-color, var(--toxic)); text-shadow: 0 0 10px currentColor; }
+  .hp-num { display: block; font-family: var(--comic); font-size: 2.6rem; letter-spacing: .02em; }
+  .hp-num.word { font-size: 1.7rem; }
+  .hp-label { font-size: .72rem; font-weight: 800; letter-spacing: .14em; }
+  .ecg { width: 100%; height: 54px; overflow: hidden; }
+  .ecg svg { width: 200%; height: 100%; display: block; animation: ecg var(--beat, 2.4s) linear infinite; }
+  .ecg path { stroke: var(--hp-color, var(--toxic)); filter: drop-shadow(0 0 3px currentColor); }
+  .hpbar { margin-top: 10px; height: 14px; background: #140e2b; border: 2px solid #000; border-radius: 99px; overflow: hidden; }
+  .hpbar i { display: block; height: 100%; width: var(--v, 100%); background: var(--hp-color, var(--toxic)); border-radius: 99px; transition: width .5s ease; }
+  .biom {
+    margin: 10px 0 0; padding: 6px 10px;
+    font-size: .8rem; line-height: 1.3; color: var(--muted);
+    background: #1b1338; border: 2px dashed var(--line); border-radius: 10px;
+  }
+  .biom.on { color: var(--toxic); border-style: solid; border-color: #3d7a1e; background: #13240f; }
+  .stats { display: grid; gap: 7px; margin-top: 12px; }
+  .stat { display: grid; grid-template-columns: 6.4em 1fr 4.6em; align-items: center; gap: 8px; font-size: .76rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+  .stat .bar { height: 11px; background: #140e2b; border: 2px solid #000; border-radius: 99px; overflow: hidden; }
+  .stat .bar i { display: block; height: 100%; width: var(--v); background: var(--c, var(--toxic)); border-radius: 99px; transition: width .5s ease; }
+  .stat .val { text-align: right; }
+  .vague .stat .bar i, .vague .hpbar i { filter: blur(2px); opacity: .8; }
+
+  .body-wrap { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; }
+  .body-svg { width: 96px; height: auto; display: block; }
+  .bp { fill: #f2b98a; }
+  .bp-torso { fill: var(--scrubs); }
+  .bp-limb { stroke: #f2b98a; }
+  .bp-heart { fill: #ff8f9a; }
+  .bp-eye, .bp-eye-other { fill: #fff; }
+  .bp.injured, .bp-limb.injured, .bp.wound, .bp-limb.wound { fill: var(--blood); stroke: var(--blood); animation: pulse 1.2s ease-in-out infinite; }
+  .bp-limb.injured, .bp-limb.wound { stroke: var(--blood); }
+  .bp.implant { fill: var(--steel); }
+  .bp-limb.implant { stroke: var(--steel); }
+  .bp-eye.implant, .bp-heart.implant, .bp-ear.implant { fill: var(--toxic); }
+  .bp.wound, .bp-limb.wound { animation: none; }
+  .bp.injured, .bp.wound { stroke: var(--ink); }
+  .parts { margin: 0; padding: 0; list-style: none; font-size: .82rem; line-height: 1.25; }
+  .parts li { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; border-top: 2px dashed var(--line); }
+  .parts li:first-child { border-top: 0; }
+  .parts .ok { color: var(--faint); }
+  .parts .wound { color: var(--blood-soft); }
+  .parts .implant { color: var(--toxic); text-align: right; }
+
+  .inventory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .item {
+    position: relative;
+    display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 6px;
+    padding: 6px 8px;
+    background: var(--panel-2); border: 2px solid #000; border-radius: 10px;
+    text-align: left; cursor: pointer;
+  }
+  .item .icon { width: 34px; height: 34px; }
+  .item .i-name { display: block; font-size: .8rem; font-weight: 800; line-height: 1.1; }
+  .item .i-desc { display: block; font-size: .7rem; line-height: 1.2; color: var(--faint); }
+  .item .count {
+    position: absolute; top: -8px; right: -6px;
+    min-width: 24px; padding: 0 6px;
+    font-family: var(--comic); font-size: 1rem; text-align: center;
+    background: var(--gold); color: var(--ink); border: 2px solid #000; border-radius: 99px;
+  }
+  .item:hover:not(:disabled) { background: var(--line); }
+  .item:disabled { cursor: default; opacity: .45; }
+  .item.empty .count { background: #3b2a6e; color: var(--faint); }
+
+  .journal ol { margin: 0; padding: 0; list-style: none; font-size: .82rem; line-height: 1.3; max-height: 220px; overflow-y: auto; }
+  .journal li { display: grid; grid-template-columns: 2.6em 1fr; gap: 6px; padding: 4px 0; border-top: 2px dashed var(--line); }
+  .journal li:first-child { border-top: 0; }
+  .journal .t { color: var(--faint); font-weight: 800; }
+  .journal .dmg { color: var(--blood-soft); }
+
+  /* ---------- end screen ---------- */
+
+  #screen-end { padding: 22px 0 60px; }
+  .end-card { overflow: hidden; }
+  .end-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 22px; }
+  .end-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(2.4rem, 8vw, 4.4rem); line-height: .95; text-shadow: 3px 3px 0 var(--ink), -3px 3px 0 var(--ink), 3px -3px 0 var(--ink), -3px -3px 0 var(--ink), 6px 7px 0 rgba(0,0,0,.5); }
+  .end-head h2.win { color: var(--toxic); }
+  .end-head h2.lose { color: var(--blood); }
+  .end-head p { margin: 8px 0 0; max-width: 60ch; }
+  .grade {
+    display: grid; place-items: center;
+    width: 112px; height: 112px;
+    font-family: var(--comic); font-size: 4rem; line-height: 1;
+    background: var(--gold); color: var(--ink);
+    border: 4px solid #000; border-radius: 50%;
+    box-shadow: 6px 6px 0 #000;
+    transform: rotate(-8deg);
+  }
+  .grade small { display: block; font-size: .9rem; letter-spacing: .1em; margin-top: -10px; }
+  .end-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; padding: 0 22px 22px; }
+  .end-body .panel { padding: 14px; background: var(--panel-2); box-shadow: none; }
+  .final-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .fs { padding: 8px; background: #140e2b; border: 2px solid #000; border-radius: 10px; text-align: center; }
+  .fs b { display: block; font-family: var(--comic); font-size: 1.6rem; font-weight: 400; color: var(--toxic); line-height: 1.1; }
+  .fs span { font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+  .implant-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .implant-row .ib { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; background: #140e2b; border: 2px solid #000; border-radius: 99px; font-size: .85rem; font-weight: 800; }
+  .implant-row .icon { width: 30px; height: 30px; }
+  .end-actions { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 22px 22px; }
+  .seed-line { font-size: .88rem; color: var(--faint); padding: 0 22px 22px; margin: 0; }
+  .seed-line code { color: var(--gold); font-weight: 800; }
+
+  /* ---------- dialogs ---------- */
+
+  dialog {
+    width: min(900px, calc(100vw - 24px));
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    color: var(--bone);
+    background: var(--panel);
+    border: 4px solid #000; border-radius: 18px;
+    box-shadow: 8px 8px 0 #000;
+  }
+  dialog::backdrop { background: rgba(8, 4, 18, .75); }
+  .dlg-head { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; background: var(--panel); border-bottom: 3px solid #000; }
+  .dlg-head h2 { margin: 0; font-family: var(--comic); font-weight: 400; font-size: 1.9rem; letter-spacing: .05em; color: var(--gold); }
+  .dlg-body { padding: 16px 18px 20px; }
+  .dlg-body h3 { margin: 16px 0 6px; font-family: var(--comic); font-weight: 400; font-size: 1.35rem; letter-spacing: .05em; color: var(--toxic); }
+  .dlg-body h3:first-child { margin-top: 0; }
+  .dlg-body p, .dlg-body li { font-size: .95rem; }
+  .dlg-body ul { padding-left: 20px; margin: 6px 0; }
+  kbd { display: inline-block; padding: 0 6px; font: 800 .85rem var(--body); background: var(--bone); color: var(--ink); border-radius: 5px; border: 2px solid #000; }
+  .codex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .codex-card { padding: 12px; background: var(--panel-2); border: 3px solid #000; border-radius: 14px; }
+  .codex-card.found { box-shadow: 0 0 0 3px #3d7a1e; }
+  .codex-card header { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: center; }
+  .codex-card .icon { width: 52px; height: 52px; background: #e9e2c8; border: 2px solid #000; border-radius: 10px; }
+  .codex-card h4 { margin: 0; font-family: var(--comic); font-weight: 400; font-size: 1.3rem; letter-spacing: .04em; line-height: 1.05; }
+  .codex-card .sub { font-size: .72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .codex-card .fx { margin: 8px 0 6px; font-size: .78rem; font-weight: 800; color: var(--gold); }
+  .codex-card p { margin: 0; font-size: .86rem; line-height: 1.4; color: var(--muted); }
+  .codex-card .found-tag { margin-top: 8px; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--toxic); }
+  .codex-part { margin: 18px 0 8px; font-family: var(--comic); font-size: 1.4rem; letter-spacing: .05em; color: var(--toxic); }
+  .codex-part:first-child { margin-top: 0; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 20px; z-index: 50;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    background: var(--bone); color: var(--ink);
+    font-weight: 800;
+    border: 3px solid #000; border-radius: 12px; box-shadow: 4px 4px 0 #000;
+    animation: rise .25s ease-out;
+  }
+
+  /* ---------- art animation ---------- */
+
+  .flicker { animation: flicker 4s steps(1) infinite; }
+  .flicker.slow { animation-duration: 7s; animation-delay: -2s; }
+  .alarm { animation: alarm 1s ease-in-out infinite; }
+  .alarm-wash { animation: wash 2s ease-in-out infinite; }
+  .zshamble { animation: shamble 1.6s ease-in-out infinite; animation-delay: var(--d, 0s); transform-box: view-box; }
+  .shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97); }
+  .steam { animation: steam 2.4s ease-in-out infinite; }
+
+  @keyframes flicker { 0%,100%{opacity:1} 46%{opacity:1} 48%{opacity:.2} 50%{opacity:1} 52%{opacity:.35} 54%{opacity:1} }
+  @keyframes alarm { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @keyframes wash { 0%,100%{opacity:.06} 50%{opacity:.2} }
+  @keyframes shamble { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg) translateY(-3px)} }
+  @keyframes shake { 10%,90%{transform:translateX(-2px)} 20%,80%{transform:translateX(4px)} 30%,50%,70%{transform:translateX(-7px)} 40%,60%{transform:translateX(7px)} }
+  @keyframes flash { 0%{opacity:1} 100%{opacity:0} }
+  @keyframes rise { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  @keyframes ecg { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  @keyframes steam { 0%,100%{transform:translateY(0); opacity:.6} 50%{transform:translateY(-6px); opacity:.2} }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- small screens ---------- */
+
+  @media (max-width: 980px) {
+    .game { grid-template-columns: 1fr; }
+    .sidebar { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .setup { grid-template-columns: 1fr; }
+    .horde { display: none; }
+  }
+  @media (max-width: 760px) {
+    .title-hero { grid-template-columns: 1fr; }
+    .ranks { grid-template-columns: 1fr; }
+    .rank .r-blurb { min-height: 0; }
+    .sidebar { grid-template-columns: 1fr; }
+    .brand { display: none; }
+    .end-body { grid-template-columns: 1fr; }
+    .end-head { grid-template-columns: 1fr; }
+    .grade { width: 90px; height: 90px; font-size: 3.2rem; }
+    .story { padding: 14px 14px 18px; }
+    .choice { grid-template-columns: auto 1fr; }
+    .choice .c-icon { display: none; }
+    .floor-cell { width: 24px; height: 24px; font-size: .9rem; }
+    .final-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 420px) {
+    .floors { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared artwork: the zombie from the landing page -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="zombie" viewBox="0 0 120 200">
+      <ellipse cx="60" cy="194" rx="40" ry="6" fill="#000" opacity=".4"/>
+      <path d="M48 140 L42 184 M72 140 L80 184" stroke="#120c24" stroke-width="24" stroke-linecap="round" fill="none"/>
+      <path d="M48 140 L42 184 M72 140 L80 184" stroke="var(--pants, #4a3f7a)" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <ellipse cx="36" cy="189" rx="15" ry="8" fill="#3a2a22" stroke="#120c24" stroke-width="4"/>
+      <ellipse cx="76" cy="189" rx="15" ry="8" fill="#3a2a22" stroke="#120c24" stroke-width="4"/>
+      <path d="M46 110 L10 116" stroke="#120c24" stroke-width="19" stroke-linecap="round"/>
+      <path d="M46 110 L10 116" stroke="var(--skin, #9bd96f)" stroke-width="11" stroke-linecap="round"/>
+      <path d="M34 94 Q34 78 48 78 L72 78 Q86 78 86 94 L86 148 L78 138 L70 150 L60 138 L50 150 L42 138 L34 148 Z" fill="var(--shirt, #c9577c)" stroke="#120c24" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M66 96 l8 8 m0 -8 l-8 8" stroke="#120c24" stroke-width="3" stroke-linecap="round"/>
+      <path d="M42 92 L4 84" stroke="#120c24" stroke-width="19" stroke-linecap="round"/>
+      <path d="M42 92 L4 84" stroke="var(--skin, #9bd96f)" stroke-width="11" stroke-linecap="round"/>
+      <path d="M40 86 L24 83" stroke="var(--shirt, #c9577c)" stroke-width="13" stroke-linecap="round"/>
+      <ellipse cx="58" cy="44" rx="31" ry="33" fill="var(--skin, #9bd96f)" stroke="#120c24" stroke-width="4"/>
+      <path d="M36 22 l6 -12 l6 10 l8 -14 l6 13 l8 -9 l4 12" fill="#3a2a22" stroke="#120c24" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="46" cy="40" r="11" fill="#fff" stroke="#120c24" stroke-width="3"/>
+      <circle cx="43" cy="41" r="3.5" fill="#120c24"/>
+      <circle cx="70" cy="43" r="7" fill="#ffe86b" stroke="#120c24" stroke-width="3"/>
+      <circle cx="68" cy="43" r="2.2" fill="#120c24"/>
+      <ellipse cx="54" cy="64" rx="13" ry="7" fill="#3b1230" stroke="#120c24" stroke-width="3"/>
+      <rect x="49" y="58" width="6" height="6" rx="1" fill="#fff" stroke="#120c24" stroke-width="1.5"/>
+      <rect x="58" y="65" width="5" height="5" rx="1" fill="#fff" stroke="#120c24" stroke-width="1.5"/>
+      <path d="M72 22 l10 10 m-8 -1 l3 -5 m1 9 l4 -5" stroke="#120c24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M9.2 9.2a3 3 0 015.6 1.3c0 2-2.8 2.4-2.8 4.2" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h7a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-5a2 2 0 00-2 2v14a2 2 0 012-2h5z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= Title ================= -->
+<section id="screen-title" class="screen">
+  <div class="wrap">
+    <div class="title-top">
+      <a class="back-link" href="../index.html"><svg width="18" height="18"><use href="#i-back"/></svg>Back to main page</a>
+      <div class="title-links">
+        <button class="btn ghost small" type="button" data-open="dlg-help"><svg><use href="#i-help"/></svg>How to play</button>
+        <button class="btn ghost small" type="button" data-open="dlg-codex"><svg><use href="#i-book"/></svg>Implant codex</button>
+      </div>
+    </div>
+
+    <div class="title-hero">
+      <div>
+        <p class="kicker">Claude Code Enhanced</p>
+        <h1><span class="w1">Surgical</span> <span class="w2">Apocalypse</span></h1>
+        <p class="tagline">The dead are rising. Your limbs are falling off. Good thing you're a surgeon.</p>
+        <p class="muted">Fight down through St. Lazarus General one floor at a time. When the horde takes a piece of you, pick the replacement and live with what it does to you.</p>
+      </div>
+      <div class="title-art" id="title-art"></div>
+    </div>
+
+    <div class="setup">
+      <div class="panel">
+        <fieldset class="ranks" id="ranks">
+          <legend>Choose your rank</legend>
+        </fieldset>
+        <div class="seed-row">
+          <label for="seed">Seed</label>
+          <input id="seed" type="text" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Leave blank for a random hospital">
+          <button class="btn ghost small" type="button" id="daily-btn">Daily shift</button>
+        </div>
+        <p class="small-print">The same seed and rank always build the same hospital, so you can race a friend or replay a run.</p>
+        <div class="start-row">
+          <button class="btn primary" type="button" id="start-btn">Start your shift</button>
+          <button class="btn" type="button" id="resume-btn" hidden>Resume run</button>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="panel whatsnew">
+          <h3>What Claude Code added</h3>
+          <ul>
+            <li><b>Five body parts and 11 implants</b> (the ear is new), each with a real biomedical engineering fact in the codex.</li>
+            <li><b>Fair, seeded randomness:</b> a fixed mix of encounters on every floor instead of coin flips, so no run is a fluke.</li>
+            <li><b>Three ranks</b> tuned by simulating thousands of games.</li>
+            <li><b>Items, karma and a growing horde:</b> bandages, antibiotics and adrenaline; good deeds open service stairs, and fleeing comes back to bite you.</li>
+            <li><b>Biometrics actually do something:</b> exact vitals and fight odds once you install a bionic eye or arm.</li>
+            <li>Hand-drawn art, autosave, high scores, keyboard play and sound.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Best runs</h3>
+          <ol class="best-list" id="best-list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Game ================= -->
+<section id="screen-game" class="screen" hidden>
+  <div class="topbar">
+    <div class="wrap">
+      <button class="icon-btn" type="button" id="menu-btn" aria-label="Main menu (your run is saved)" title="Main menu (your run is saved)"><svg><use href="#i-menu"/></svg></button>
+      <div class="brand"><span class="w1">Surgical</span> <span class="w2">Apocalypse</span></div>
+      <div class="tracker">
+        <div class="floors" id="floors" aria-hidden="true"></div>
+        <div class="floor-meta">
+          <div class="floor-name" id="floor-name"></div>
+          <div class="pips" id="pips" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="horde" id="horde" title="The horde grows every turn, and faster when you leave zombies alive.">
+        <span class="horde-label">Horde: <b id="horde-word">Restless</b></span>
+        <span class="horde-bar"><i></i><i></i><i></i><i></i></span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" type="button" data-open="dlg-codex" aria-label="Implant codex" title="Implant codex"><svg><use href="#i-book"/></svg></button>
+        <button class="icon-btn" type="button" data-open="dlg-help" aria-label="How to play" title="How to play"><svg><use href="#i-help"/></svg></button>
+        <button class="icon-btn" type="button" id="sound-btn" aria-label="Sound on" title="Sound"><svg><use href="#i-sound"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap game">
+    <article class="panel story-card" id="story-card">
+      <div class="scene" id="scene"><div class="flash" id="flash"></div></div>
+      <div class="story">
+        <h2 id="node-title" tabindex="-1"></h2>
+        <div id="live" aria-live="polite">
+          <div class="outcome" id="outcome" hidden></div>
+          <div class="narrative" id="narrative"></div>
+        </div>
+        <ul class="choices" id="choices"></ul>
+      </div>
+    </article>
+
+    <aside class="sidebar" id="sidebar" aria-label="Your condition">
+      <section class="panel" id="vitals-panel">
+        <h3>Vitals</h3>
+        <div class="monitor">
+          <div class="hp-readout"><span class="hp-num" id="hp-num">100</span><span class="hp-label">HP</span></div>
+          <div class="ecg" aria-hidden="true">
+            <svg viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 34h40l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46l8-14 10 30 10-34 6 18h46" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="hpbar"><i id="hp-bar"></i></div>
+        <p class="biom" id="biom"></p>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Body</h3>
+        <div class="body-wrap">
+          <div id="body"></div>
+          <ul class="parts" id="parts"></ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Pockets</h3>
+        <div class="inventory" id="inventory"></div>
+      </section>
+
+      <section class="panel journal">
+        <h3>Journal</h3>
+        <ol id="journal"></ol>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= End ================= -->
+<section id="screen-end" class="screen" hidden>
+  <div class="wrap">
+    <article class="panel end-card">
+      <div class="scene" id="end-scene"></div>
+      <div class="end-head">
+        <div>
+          <h2 id="end-title"></h2>
+          <p id="end-text"></p>
+        </div>
+        <div class="grade" id="end-grade"></div>
+      </div>
+      <div class="end-body">
+        <section class="panel">
+          <h3>Final stats</h3>
+          <div class="final-stats" id="end-stats"></div>
+        </section>
+        <section class="panel">
+          <h3>Implants installed</h3>
+          <div class="implant-row" id="end-implants"></div>
+          <h3 style="margin-top:14px">How it went</h3>
+          <div class="journal"><ol id="end-journal"></ol></div>
+        </section>
+      </div>
+      <p class="seed-line" id="end-seed"></p>
+      <div class="end-actions">
+        <button class="btn primary" type="button" id="again-btn">New run</button>
+        <button class="btn" type="button" id="replay-btn">Replay this seed</button>
+        <button class="btn ghost" type="button" id="share-btn">Copy challenge link</button>
+        <button class="btn ghost" type="button" id="title-btn">Main menu</button>
+        <a class="btn ghost" href="../index.html">Back to main page</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= Dialogs ================= -->
+<dialog id="dlg-help" aria-labelledby="help-title">
+  <div class="dlg-head"><h2 id="help-title">How to play</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="dlg-body">
+    <h3>Get out alive</h3>
+    <p>You start on the top floor of St. Lazarus General. Every floor has a handful of hallway stretches, then a stairwell. Reach the ground floor and get through the crowd at the doors.</p>
+    <h3>Your vitals</h3>
+    <ul>
+      <li><b>HP</b>: hit 0 and you join the horde.</li>
+      <li><b>Bleeding</b> costs that much HP every turn. Bandages and implants stop it.</li>
+      <li><b>Infection</b> is the chance each turn that a fever hits you for 6 HP. Bites raise it. Antibiotics lower it.</li>
+      <li><b>Attack</b> lowers the damage you take in a fight. <b>Mobility</b> raises your odds of escaping.</li>
+      <li><b>Karma</b>: at 70 or more, survivors show you service stairs that skip part of a floor. At 30 or less, the dead follow the screams of the people you left behind.</li>
+    </ul>
+    <h3>Biometrics</h3>
+    <p>Without implants you only get a rough feel for your condition ("Shaky", "Feverish"). Install a <b>bionic eye</b> or <b>bionic arm</b> to get exact numbers and the projected odds of every fight.</p>
+    <h3>The horde</h3>
+    <p>Every turn the hospital fills up a little more and groups of zombies get bigger. Running away is often safe, but the zombies you leave alive keep hunting you and grow the horde. Fighting costs HP now; fleeing can cost more later.</p>
+    <h3>Taking time</h3>
+    <p>Moving on, searching a room and performing surgery each take a turn, and bleeding, a failing heart and infection all hit on every turn. Using an item from your pockets is free.</p>
+    <h3>Controls</h3>
+    <p>Click or tap a choice, or press <kbd>1</kbd>–<kbd>9</kbd>. Use items with <kbd>B</kbd> bandage, <kbd>A</kbd> antibiotics, <kbd>P</kbd> painkillers. <kbd>Esc</kbd> closes this window. Your run saves after every move.</p>
+  </div>
+</dialog>
+
+<dialog id="dlg-codex" aria-labelledby="codex-title">
+  <div class="dlg-head"><h2 id="codex-title">Implant codex</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="dlg-body" id="codex-body"></div>
+</dialog>
+
+<script src="engine.js"></script>
+<script src="art.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
