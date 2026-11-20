@@ -14,10 +14,8 @@
 tw-passage {
   font-family: Audiowide;
   font: white;
-  background : #454545;
-  
+  background : #051a02;
 }
-
 .smallCap {
 	font-size: 0.5em;
 }
@@ -36,6 +34,10 @@ tw-passage {
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name=" Continue Straight" tags="" position="1025,1275" size="100,100">{
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 2)
+(if: (random:0,100) &lt; $infectionChance)[
+	You feel an infection setting in on one of your injuries... &lt;br/&gt;
+    (set: $health = $health - 5)
+]
 (if: $seeMetrics)[
 	HP: $health &lt;br/&gt;
     Bleed Rate: $bleedRate &lt;br/&gt;
@@ -45,33 +47,45 @@ tw-passage {
 (if: $health &lt; 1)[
 	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
     [[Game Over]]
-] (else-if: $progress &gt; 99)[
+] (else-if: $progress &gt; $finalPval - 1)[
 	You see the exit up ahead. You can finally make your escape! &lt;br/&gt;
     [[Exit the Building]] &lt;br/&gt;
     [[Enter a Nearby Room]] 
-] (else-if: (random:0,100) &lt; 15)[
+] (else-if: (random: 0,100) &gt; $karma)[
+There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
+[[Fight Past Them]] &lt;br/&gt;
+[[Flee]]
+](else-if: (random:0,100) &lt; $prostheticChance)[
 	You begin to feel faint and nauseous... &lt;br/&gt;
     There is an examination room nearby &lt;br/&gt;
-    [[Enter Examination Room]]
+    [[Enter Examination Room]] &lt;br/&gt;
     [[Lie Down and Rest For a Bit (I don&#39;t think you will survive this)-&gt;Game Over]] 
 ] (else:)[
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
 	(if: (random:0,100) &lt; 33)[
     	You approach an intersection of hallways &lt;br/&gt;
         [[Turn Left]] &lt;br/&gt;
         [[Turn Right]] &lt;br/&gt;
  	]
     [[ Continue Straight]]  &lt;br/&gt;
-    [[Enter a Nearby Room]]
+    [[Enter a Nearby Room]] &lt;br/&gt;
     (if: (random:0,100) &lt; $karma / 2)[
     	There is also a stairwell to go down a few floors &lt;br/&gt;
         [[Go Down]]
     ]
 ]
 }</tw-passagedata><tw-passagedata pid="2" name="Beginning" tags="" position="900,375" size="100,100">You work at the top floor of the hospital as an orthopaedic surgeon. One day, while performing surgery, the power goes out in the building. You continue work under the backgup generator, but you begin to hear screams in the distance.
-
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px  src = &quot;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkZ8hdQD89sKVbhXbkDW7N_w7JAjOJfoU4GpTrSHmquy70OY7YIIX6ZEdx&amp;s=10&quot; /&gt;
+&lt;/div&gt;
 [[Continue with the operation]]
 [[Go Investigate]]
-
+{
 (set: $health = 100)
 (set: $karma = 50)
 (set: $mobility = 80)
@@ -80,13 +94,70 @@ tw-passage {
 (set: $progress = 0)
 (set: $attack = 5)
 
-(set: $seeMetrics = false)</tw-passagedata><tw-passagedata pid="3" name="Continue with the operation" tags="" position="900,500" size="100,100">{
+(set: $seeMetrics = false)
+(set: $finalPval = 60)
+(set: $prostheticChance = 65)
+}</tw-passagedata><tw-passagedata pid="3" name="Continue with the operation" tags="" position="900,500" size="100,100">{
 (set: $karma = $karma + 25)
 
 You cannot abandon the patient in the middle of an operation. You complete the hip replacement surgery as the noises become increasingly distressing. You are just sewing the patient up when you hear crashing noises and more screams very near the room you are in. 
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://media.istockphoto.com/id/1251257207/vector/surgical-team-performing-operation-on-patient-in-hospital.jpg?s=612x612&amp;w=0&amp;k=20&amp;c=7oT35x0I92WFgKafibNCeYWYgUjKtljhC-nwk2o66M0=&quot; /&gt;
+&lt;/div&gt;
 &lt;br/&gt;
 [[Enter the Hallway]]
-}</tw-passagedata><tw-passagedata pid="4" name="Enter a Nearby Room" tags="" position="775,1125" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="4" name="Enter Examination Room" tags="" position="1425,1225" size="100,100">{
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 2)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else:)[
+	(set: $limbLost = (random:1,4))
+    (if: $limbLost is 1)[
+    	You collapse into the examination room stop to see your leg is in terrible shape. You could continue on like this, but you could also hope for a better chance with a prosthetic. &lt;br/&gt;
+        {
+&lt;svg viewBox=&quot;0 0 200 400&quot; width=&quot;200&quot; height=&quot;400&quot;&gt;&lt;g stroke=&quot;#26282c&quot; stroke-width=&quot;5&quot; stroke-linejoin=&quot;round&quot; stroke-linecap=&quot;round&quot;&gt;
+&lt;path d=&quot;M45 20 H155 Q160 20 158 30 L140 125 Q138 135 128 135 H72 Q62 135 60 125 L42 30 Q40 20 45 20 Z&quot; fill=&quot;#9aa4b1&quot;/&gt;&lt;path d=&quot;M47 55 H153 L150 71 H50 Z&quot; fill=&quot;#3fd0e0&quot;/&gt;
+&lt;rect x=&quot;78&quot; y=&quot;160&quot; width=&quot;44&quot; height=&quot;170&quot; rx=&quot;14&quot; fill=&quot;#c9d1da&quot;/&gt;&lt;rect x=&quot;90&quot; y=&quot;195&quot; width=&quot;20&quot; height=&quot;100&quot; rx=&quot;8&quot; fill=&quot;#3fd0e0&quot; stroke-width=&quot;3&quot;/&gt;
+&lt;path d=&quot;M76 330 Q76 312 100 312 Q118 312 128 328 L176 350 Q192 357 187 371 Q184 380 170 380 H72 Q62 380 64 368 Z&quot; fill=&quot;#9aa4b1&quot;/&gt;&lt;path d=&quot;M66 366 H188&quot; fill=&quot;none&quot;/&gt;
+&lt;circle cx=&quot;100&quot; cy=&quot;150&quot; r=&quot;32&quot; fill=&quot;#6b7685&quot;/&gt;&lt;circle cx=&quot;100&quot; cy=&quot;150&quot; r=&quot;13&quot; fill=&quot;#3fd0e0&quot; stroke-width=&quot;3&quot;/&gt;&lt;circle cx=&quot;100&quot; cy=&quot;330&quot; r=&quot;16&quot; fill=&quot;#6b7685&quot;/&gt;&lt;/g&gt;
+&lt;g fill=&quot;#26282c&quot;&gt;&lt;circle cx=&quot;66&quot; cy=&quot;100&quot; r=&quot;4&quot;/&gt;&lt;circle cx=&quot;134&quot; cy=&quot;100&quot; r=&quot;4&quot;/&gt;&lt;/g&gt;&lt;g stroke=&quot;#fff&quot; stroke-opacity=&quot;.6&quot; stroke-width=&quot;6&quot; stroke-linecap=&quot;round&quot; fill=&quot;none&quot;&gt;&lt;path d=&quot;M58 38 L70 115&quot;/&gt;&lt;path d=&quot;M87 188 V302&quot;/&gt;&lt;circle cx=&quot;84&quot; cy=&quot;137&quot; r=&quot;4&quot; fill=&quot;#fff&quot; stroke=&quot;none&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;
+}
+        [[Go on as is]] &lt;br/&gt;
+        [[Osteointegrated leg implant]] &lt;br/&gt;
+        [[Peg Leg]] &lt;br/&gt;
+        [[Bionic Leg]] &lt;br/&gt;
+    ] (else-if: $limbLost is 2)[
+    	You stumble in and slam the door behind you. As you do, you see your arm is a torn up disaster. You have some of your prosthetic replacements in the room with you to swap out if you wish. &lt;br/&gt;
+        &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2012/04/13/00/08/robotic-31136_640.png&quot; /&gt;
+&lt;/div&gt;
+        [[Go on as is]] &lt;br/&gt;
+        [[Titanium arm implant]] &lt;br/&gt;
+        [[Bionic arm]] &lt;br/&gt;
+    ] (else-if: $limbLost is 3)[
+    	Your vision continues to get blurrier as the door clicks closed behind you. You look into a nearby mirror and see your eye is ruined. You see some replacement options on the shelf next to you
+        &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2013/07/12/18/41/android-153695_640.png&quot; /&gt;
+&lt;/div&gt;
+        [[Go on as is]]  &lt;br/&gt;
+        [[Bionic Eye]] &lt;br/&gt;
+        [[Glass Eye]] &lt;br/&gt;
+    ] (else-if: $limbLost is 4)[
+    	Your already poor heart health has begun to overwhelm you. You can feel your heart starting to fail..
+        [[Go on as is]]  &lt;br/&gt;
+        [[Attach a pacemaker]] &lt;br/&gt;
+        [[Connect to the Heart Lung Machine]] &lt;br/&gt;
+    ]
+] 
+}</tw-passagedata><tw-passagedata pid="5" name="Enter a Nearby Room" tags="" position="775,1125" size="100,100">{
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 1)
 (if: $seeMetrics)[
@@ -96,27 +167,75 @@ You cannot abandon the patient in the middle of an operation. You complete the h
     Mobility: $mobility &lt;br/&gt;
 ]
 (if: $health &lt; 1)[
-	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... 
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
 ] (else:)[
-	(if: (random:0,100) &lt; 30)[
+	(if: (random:0,100) &lt; 40)[
     	You find a patient bleeding out on the floor of the room! There are medical supplied around the room to help stop bleeding.&lt;br/&gt;
-        [[Help Them]]
+        &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/27/15/57/patient-5691153_640.png&quot; /&gt;
+&lt;/div&gt;
+        [[Help Them]] &lt;br/&gt;
         [[Use the Supplies on Yourself]]
+    ] (else-if: (random:0,100) &lt; 40)[
+    	You find medical supplies to help bandage your wounds.&lt;br/&gt;
+        (if: (random:0,100) &lt; 50)[
+    		[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    	](else:)[
+    		[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    	]
+    ] (else-if: (random:0,100) &lt; 60)[
+    
+    	There are zombies lurking in the room!&lt;br/&gt;
+        &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
+        [[Fight Past Them]] &lt;br/&gt;
+		[[Flee]]
+    ]  (else:)[
+    	Nothing interesting in here... &lt;br/&gt;
+        (if: (random:0,100) &lt; 50)[
+    		[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    	](else:)[
+    		[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    	]
     ]
 ]
-}</tw-passagedata><tw-passagedata pid="5" name="Enter the Hallway" tags="" position="950,750" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="6" name="Enter the Hallway" tags="" position="950,750" size="100,100">{
+(set: $progress = $progress + 1)
 (if: (random: 0,100) &gt; $karma)[
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
 There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
 [[Fight Past Them]] &lt;br/&gt;
 [[Flee]]
 
 ] (else:) [
 You do not see anything but a dark hallway. &lt;br/&gt;
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
 [[Continue -&gt; Continue Straight]]
 ]
-}</tw-passagedata><tw-passagedata pid="6" name="Fight Past Them" tags="" position="887.5,875" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="7" name="Exit the Building" tags="" position="1075,1600" size="100,100">&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2014/04/03/10/03/emergency-309726_640.png&quot; /&gt;
+&lt;/div&gt;
+You rush out of the hospital exit.
+You made it.
+What is next? 
+Who knows? But you survived the entire fight to get out of the hospital!!
+
+Final Stats:
+
+HP: $health
+Bleed Rate: $bleedRate 
+Attack Strength: $attack 
+Mobility: $mobility 
+Karma: $karma
+Chance of Infection: $infectionChance</tw-passagedata><tw-passagedata pid="8" name="Fight Past Them" tags="" position="900,875" size="100,100">{
 (set: $progress = $progress + 2)
-(set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 0,3))
+(set: $damageTaken = ((100 - $mobility / 5 - $attack * 2) / 50 * (random: 0,10)))
 (if: $damageTaken &gt; 5)[
 	(set: $bleedRate = $bleedRate + 1)
 ]
@@ -124,7 +243,8 @@ You do not see anything but a dark hallway. &lt;br/&gt;
 (if: $seeMetrics)[
 	HP: $health &lt;br/&gt;
     Bleed Rate: $bleedRate &lt;br/&gt;
-    Damage Taken: $damageTaken &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
 ]
 
 (if: $health &lt; 1)[
@@ -132,9 +252,12 @@ You do not see anything but a dark hallway. &lt;br/&gt;
     [[Game Over]]
 ] (else:)[
  	You manage to fight you way past. 
- 	(if: $damageTaken)[
+ 	(if: $damageTaken &gt; 0)[
     	 You didn&#39;t get through unscathed though. 
     ] &lt;br/&gt;
+    &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
  	(if: (random:0,100) &lt; 33)[
     	You approach an intersection of hallways &lt;br/&gt;
         [[Turn Left]] &lt;br/&gt;
@@ -143,12 +266,12 @@ You do not see anything but a dark hallway. &lt;br/&gt;
     [[ Continue Straight]]  &lt;br/&gt;
     [[Enter a Nearby Room]]
 ]
-}</tw-passagedata><tw-passagedata pid="7" name="Flee" tags="" position="1012.5,875" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="9" name="Flee" tags="" position="1075,875" size="100,100">{
 (set: $progress = $progress + 1)
 (set: $caught = $mobility / 2.5 &lt; (random: 0,40))
 (if: $caught)[
 	You attempt to flee but you were clumsy and got caught, recieving some injuries.&lt;br/&gt;
-    	(set: $damageTaken = ($mobility + ($damage * 3)) / 50 * (random: 1,6))
+    	(set: $damageTaken = ((100 - $mobility / 5 - $attack * 2) / 50 * (random: 0,15))
  		 (if: $damageTaken &gt; 5)[
       		(set: $bleedRate = $bleedRate + 1)
   		]
@@ -157,16 +280,20 @@ You do not see anything but a dark hallway. &lt;br/&gt;
 (if: $seeMetrics)[
 	HP: $health &lt;br/&gt;
     Bleed Rate: $bleedRate &lt;br/&gt;
-    Damage Taken: $damageTaken &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
 ]
 (if: $health &lt; 1)[
 	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
     [[Game Over]]
 ] (else:)[
  	You managed to flee past them with your life. 
- 	(if: $damageTaken)[
+ 	(if: $damageTaken &gt; 0)[
     	 You were not quite quick enough though and they gave you a few small injuries. 
     ] &lt;br/&gt;
+    &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
  	(if: (random:0,100) &lt; 33)[
     	You approach an intersection of hallways &lt;br/&gt;
         [[Turn Left]] &lt;br/&gt;
@@ -175,37 +302,81 @@ You do not see anything but a dark hallway. &lt;br/&gt;
     [[ Continue Straight]]  &lt;br/&gt;
     [[Enter a Nearby Room]]
 ]
-}</tw-passagedata><tw-passagedata pid="8" name="Go Investigate" tags="" position="1025,500" size="100,100">{
-(set: $karma = $karma - 10)
-(set: $attack = $attack + 10)
+}</tw-passagedata><tw-passagedata pid="10" name="Game Over" tags="" position="925,1600" size="100,100">You lost too much blood, dying.. to rise again..
 
-You grab your electric bone saw and abandon the patient mid surgery. They likely will not survive if you don&#39;t get back quickly. 
-&lt;br/&gt;
-[[Enter the Hallway]]
-}</tw-passagedata><tw-passagedata pid="9" name="Turn Left" tags="" position="900,1200" size="100,100"></tw-passagedata><tw-passagedata pid="10" name="Turn Right" tags="" position="1125,1200" size="100,100"></tw-passagedata><tw-passagedata pid="11" name="Exit the Building" tags="" position="1075,1600" size="100,100"></tw-passagedata><tw-passagedata pid="12" name="Help Them" tags="" position="500,1125" size="100,100">{
-(set: $bleedRate = (max:0, $bleedRate - 3))
-(set: $karma = (max:0, $karma - 15))
-(set: $health = (min: 100, $health + 5))
+Hopefully you enjoy the taste of brains!
+
+Final Stats:
+
+HP: $health
+Bleed Rate: $bleedRate 
+Attack Strength: $attack 
+Mobility: $mobility 
+Karma: $karma
+Chance of Infection: $infectionChance
+(set: $pPerc = $progress / $finalPval * 100) 
+Final Progress: $pPerc %
+(if: $pPerc &gt; 70)[
+	You were so close...
+]</tw-passagedata><tw-passagedata pid="11" name="Go Down" tags="" position="800,1300" size="100,100">{
 (set: $health = $health - $bleedRate)
-(set: $progress = $progress + 1)
+(set: $progress = $progress + 5)
+(if: (random:0,100) &lt; $infectionChance)[
+	You feel an infection setting in on one of your injuries... &lt;br/&gt;
+    (set: $health = $health - 5)
+]
 (if: $seeMetrics)[
 	HP: $health &lt;br/&gt;
     Bleed Rate: $bleedRate &lt;br/&gt;
     Attack Strength: $attack &lt;br/&gt;
     Mobility: $mobility &lt;br/&gt;
 ]
+You make your way down the stairs to the floor below. You can feel yourself getting closer to the way out of here as you continue down the next hallway... &lt;br/&gt;
 (if: $health &lt; 1)[
 	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
     [[Game Over]]
+] (else-if: $progress &gt; $finalPval - 1)[
+	You see the exit up ahead. You can finally make your escape! &lt;br/&gt;
+    [[Exit the Building]] &lt;br/&gt;
+    [[Enter a Nearby Room]] 
+]  (else-if: (random: 0,100) &gt; $karma)[
+	There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
+    &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
+	[[Fight Past Them]] &lt;br/&gt;
+	[[Flee]]
+](else-if: (random:0,100) &lt; $prostheticChance)[
+	You begin to feel faint and nauseous... &lt;br/&gt;
+    There is an examination room nearby &lt;br/&gt;
+    [[Enter Examination Room]] &lt;br/&gt;
+    [[Lie Down and Rest For a Bit (I don&#39;t think you will survive this)-&gt;Game Over]] 
 ] (else:)[
-	You use the supplies for yourself to slow your bleeding while the patient grows progressively weaker.. &lt;br/&gt;
-    (if: (random:0,100) &lt; 50)[
-    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
-    ](else:)[
-    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
+	(if: (random:0,100) &lt; 33)[
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
+ 	]
+    [[ Continue Straight]]  &lt;br/&gt;
+    [[Enter a Nearby Room]] &lt;br/&gt;
+    (if: (random:0,100) &lt; $karma / 2)[
+    	There is also a stairwell to go down a few floors &lt;br/&gt;
+        [[Go Down]]
     ]
 ]
-}</tw-passagedata><tw-passagedata pid="13" name="Use the Supplies on Yourself" tags="" position="500,1250" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="12" name="Go Investigate" tags="" position="1025,500" size="100,100">{
+(set: $karma = $karma - 10)
+(set: $attack = $attack + 10)
+You grab your electric bone saw and abandon the patient mid surgery. They likely will not survive if you don&#39;t get back quickly. 
+&lt;br/&gt;
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://thumbs.dreamstime.com/b/old-bone-saw-black-icon-amputation-symbol-old-bone-saw-black-icon-amputation-symbol-isolated-white-background-311224046.jpg?w=768&quot; /&gt;
+&lt;/div&gt;
+[[Enter the Hallway]]
+}</tw-passagedata><tw-passagedata pid="13" name="Help Them" tags="" position="500,1125" size="100,100">{
 (set: $karma = (min: 100, $karma + 15))
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 1)
@@ -219,16 +390,118 @@ You grab your electric bone saw and abandon the patient mid surgery. They likely
 	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
     [[Game Over]]
 ] (else:)[
-	You use the supplies for yourself to slow your bleeding while the patient grows progressively weaker.. &lt;br/&gt;
+	You do what you can to help the patient. You stabilize them, stop their bleeding, and leave them to rest. &lt;br/&gt;
     (if: (random:0,100) &lt; 50)[
     	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
     ](else:)[
     	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
     ]
 ]
-}</tw-passagedata><tw-passagedata pid="14" name="Game Over" tags="" position="925,1600" size="100,100"></tw-passagedata><tw-passagedata pid="15" name="Go Down" tags="" position="800,1300" size="100,100"></tw-passagedata><tw-passagedata pid="16" name="Enter Examination Room" tags="" position="1425,1225" size="100,100">{
+}</tw-passagedata><tw-passagedata pid="14" name="Turn Left" tags="" position="900,1200" size="100,100">{
 (set: $health = $health - $bleedRate)
 (set: $progress = $progress + 2)
+(if: (random:0,100) &lt; $infectionChance)[
+	You feel an infection setting in on one of your injuries... &lt;br/&gt;
+    (set: $health = $health - 5)
+]
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You follow the hallway intersection to the left... &lt;br/&gt;
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else-if: $progress &gt; $finalPval - 1)[
+	You see the exit up ahead. You can finally make your escape! &lt;br/&gt;
+    [[Exit the Building]] &lt;br/&gt;
+    [[Enter a Nearby Room]] 
+]  (else-if: (random: 0,100) &gt; $karma)[
+	There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
+    &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
+	[[Fight Past Them]] &lt;br/&gt;
+	[[Flee]]
+](else-if: (random:0,100) &lt; $prostheticChance)[
+	You begin to feel faint and nauseous... &lt;br/&gt;
+    There is an examination room nearby &lt;br/&gt;
+    [[Enter Examination Room]] &lt;br/&gt;
+    [[Lie Down and Rest For a Bit (I don&#39;t think you will survive this)-&gt;Game Over]] 
+] (else:)[
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
+	(if: (random:0,100) &lt; 33)[
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
+ 	]
+    [[ Continue Straight]]  &lt;br/&gt;
+    [[Enter a Nearby Room]] &lt;br/&gt;
+    (if: (random:0,100) &lt; $karma / 2)[
+    	There is also a stairwell to go down a few floors &lt;br/&gt;
+        [[Go Down]]
+    ]
+]
+}</tw-passagedata><tw-passagedata pid="15" name="Turn Right" tags="" position="1150,1175" size="100,100">{
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 2)
+(if: (random:0,100) &lt; $infectionChance)[
+	You feel an infection setting in on one of your injuries... &lt;br/&gt;
+    (set: $health = $health - 5)
+]
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You follow the hallway intersection to the right... &lt;br/&gt;
+(if: $health &lt; 1)[
+	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
+    [[Game Over]]
+] (else-if: $progress &gt; $finalPval - 1)[
+	You see the exit up ahead. You can finally make your escape! &lt;br/&gt;
+    [[Exit the Building]] &lt;br/&gt;
+    [[Enter a Nearby Room]] 
+]  (else-if: (random: 0,100) &gt; $karma)[
+	There are zombies in the hallway! They smell you and begin to come after you. &lt;br/&gt;
+    &lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://cdn.pixabay.com/photo/2020/10/10/10/40/halloween-5642706_640.png&quot; /&gt;
+&lt;/div&gt;
+	[[Fight Past Them]] &lt;br/&gt;
+	[[Flee]]
+](else-if: (random:0,100) &lt; $prostheticChance)[
+	You begin to feel faint and nauseous... &lt;br/&gt;
+    There is an examination room nearby &lt;br/&gt;
+    [[Enter Examination Room]] &lt;br/&gt;
+    [[Lie Down and Rest For a Bit (I don&#39;t think you will survive this)-&gt;Game Over]] 
+] (else:)[
+&lt;div class=&quot;mainImages&quot;&gt;
+&lt;img height = 300px width = 300px src = &quot;https://images.unsplash.com/photo-1572297870735-065d402f7b29?fm=jpg&amp;q=60&amp;w=1200&amp;auto=format&amp;fit=crop&quot; /&gt;
+&lt;/div&gt;
+	(if: (random:0,100) &lt; 33)[
+    	You approach an intersection of hallways &lt;br/&gt;
+        [[Turn Left]] &lt;br/&gt;
+        [[Turn Right]] &lt;br/&gt;
+ 	]
+    [[ Continue Straight]]  &lt;br/&gt;
+    [[Enter a Nearby Room]] &lt;br/&gt;
+    (if: (random:0,100) &lt; $karma / 2)[
+    	There is also a stairwell to go down a few floors &lt;br/&gt;
+        [[Go Down]]
+    ]
+]
+}</tw-passagedata><tw-passagedata pid="16" name="Use the Supplies on Yourself" tags="" position="500,1250" size="100,100">{
+(set: $bleedRate = (max:0, $bleedRate - 3))
+(set: $karma = (max:0, $karma - 15))
+(set: $health = (min: 100, $health + 5))
+(set: $health = $health - $bleedRate)
+(set: $progress = $progress + 2)
+
 (if: $seeMetrics)[
 	HP: $health &lt;br/&gt;
     Bleed Rate: $bleedRate &lt;br/&gt;
@@ -239,17 +512,213 @@ You grab your electric bone saw and abandon the patient mid surgery. They likely
 	You have lost too much blood. The world begins to grow faint as you feel a deep hunger grow... &lt;br/&gt;
     [[Game Over]]
 ] (else:)[
-	$limbLost = (random:1,4)
-    (if: $limbLost = 1)[
-    	Leg
-    ] (else-if: $limbLost = 2)[
-    	Arm
-    ] (else-if: $limbLost = 2)[
-    	Eye
-    ] (else-if: $limbLost = 2)[
-    	Heart
+	You use the supplies for yourself to slow your bleeding while the patient grows progressively weaker.. &lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
     ]
-] 
+]
+}</tw-passagedata><tw-passagedata pid="17" name="Go on as is" tags="" position="1600,975" size="100,100">{
+(set: $health = $health + 8)
+(set: $bleedRate = (min: 100, $bleedRate + 2))
+(set: $progress = $progress + 1)
+(set: $infectionChance = (min: 100, $infectionChance + 5))
+(set: $mobility = (max: 0, $mobility - 10))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You focus instead on bandaging what wounds you can. Otherwise, you ignore the damage to your body, accepting the heavy bleeding and chance of infection. Moving is getting a bit harder...
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="18" name="Osteointegrated leg implant" tags="" position="1475,975" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (max: 0, $infectionChance - 4))
+(set: $bleedRate = (max: 0, $bleedRate - 2))
+(set: $mobility = (min: 100, $mobility + 10))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+The implant is very well attached, increasing your mobility while lessening the bleeding.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="19" name="Bionic Leg" tags="" position="1350,975" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (min: 100, $infectionChance + 1))
+(set: $bleedRate = (max: 0, $bleedRate - 1))
+(set: $attack = (min: 100, $attack + 15))
+(set: $mobility = (max: 0, $mobility - 10))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+The implant is heavy, making mobility harder. It also not the best attached prosthetic, so the chance of an infection is a little higher. The heavy, powerful leg makes you much stronger in fighting the zombies though.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="20" name="Peg Leg" tags="" position="1475,850" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (min: 100, $infectionChance + 1))
+(set: $bleedRate = (max: 0, $bleedRate - 1))
+(set: $attack = (min: 100, $attack + 5))
+(set: $mobility = (max: 0, $mobility - 5))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+The simple leg replacement is a bit crude, making mobility hard and giving some risk of infection. You are a bit stronger against the zombies with a leg they cannot bite and is like a wooden club on your foot.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="21" name="Titanium arm implant" tags="" position="1875,1075" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (max: 0, $infectionChance - 3))
+(set: $bleedRate = (max: 0, $bleedRate - 2))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+The implant is very well attached. It is a strong implant useful in combat. You have less bleeding and infection chance as well.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="22" name="Bionic arm" tags="" position="1875,1175" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (min: 100, $infectionChance + 1))
+(set: $bleedRate = (max: 0, $bleedRate - 1))
+(set: $attack = (min: 100, $attack + 15))
+(set: $mobility = (max: 0, $mobility - 5))
+(set: $seeMetrics = true)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+The implant is heavy, making movement a bit awkward, but it is also a very powerful bionic arm to help with fighting. Also, you find the arm comes with high quality biometric scanning, giving you live diagnostic data on your condition, but your chance of an infection increases slightly.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="23" name="Bionic Eye" tags="" position="1850,1450" size="100,100">{
+(set: $health = $health + 3)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (min: 100, $infectionChance + 1))
+(set: $bleedRate = (max: 0, $bleedRate - 1))
+(set: $attack = (min: 100, $attack + 8))
+(set: $seeMetrics = true)
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You replace your eye with a bionic one. The bleeding is stopped and you begin to feel better. You realize the bionic eye gives you a constant diagnostic reading on your vitals. It also increases your perception in fighting the zombies.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="24" name="Glass Eye" tags="" position="1850,1350" size="100,100">{
+(set: $health = $health + 5)
+(set: $progress = $progress + 1)
+(set: $infectionChance = (max: 0, $infectionChance - 1))
+(set: $bleedRate = (max: 0, $bleedRate - 1))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You replace your eye with a glass one. Nothing special but at least you have dealth with the bleeding and infection risk.
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="25" name="Attach a pacemaker" tags="" position="1350,1500" size="100,100">{
+(set: $health = $health + 8)
+(set: $progress = $progress + 2)
+(set: $attack = (min: 100, $attack + 8))
+(set: $mobility = (min: 100, $mobility + 8))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You miraculously perform your own heart surgery, putting the pacemaker in. You feel better and ready to keep running for your life.
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
+}</tw-passagedata><tw-passagedata pid="26" name="Connect to the Heart Lung Machine" tags="" position="1475,1500" size="100,100">{
+(set: $health = $health + 10)
+(set: $infectionChance = (min: 100, $infectionChance + 1))
+(set: $attack = (max: 0, $attack - 30))
+(set: $mobility = (max: 0, $mobility - 50))
+(if: $seeMetrics)[
+	HP: $health &lt;br/&gt;
+    Bleed Rate: $bleedRate &lt;br/&gt;
+    Attack Strength: $attack &lt;br/&gt;
+    Mobility: $mobility &lt;br/&gt;
+]
+You attach yourself to the heart lung machine as your heart was giving out. You stay conscious and on your feet. You begin to drag the giant machine behind you that somehow stays fully powered and working as you move...
+&lt;br/&gt;
+    (if: (random:0,100) &lt; 50)[
+    	[[Return to The Hallway and Continue -&gt;Enter the Hallway]] 
+    ](else:)[
+    	[[Return to The Hallway and Continue -&gt; Continue Straight]] 
+    ]
+
 }</tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
 var require,define;!function(){var e={},r={};require=function(i){var n=e[i];return n&&(r[i]=n[1].apply(void 0,n[0].map(require)),e[i]=void 0),r[i]},(define=function(r,i,n){if("function"==typeof r)return r();e[r]=[i,n]}).amd=!0}();/*!
